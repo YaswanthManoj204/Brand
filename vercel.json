@@ -1,11 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "staticfiles",
   "builds": [
     {
       "src": "build_files.sh",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "backend/staticfiles"
+        "distDir": "staticfiles"
       }
     },
     {
