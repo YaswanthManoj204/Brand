@@ -106,7 +106,17 @@ class SubdomainRoutingMiddleware:
             sub = host.split('.')[0].strip()
             return sub if sub else None
 
-        # 6. Fallback for generic domains with 3+ parts (e.g. raj.hostingdomain.com)
+        # 6. Cloud / Serverless platform domains (*.vercel.app, *.onrender.com, *.railway.app)
+        for platform_suffix in ('.vercel.app', '.onrender.com', '.railway.app', '.appspot.com'):
+            if host.endswith(platform_suffix):
+                parts = host.split('.')
+                # 3 parts (e.g. brandnest-black.vercel.app) is the main platform website
+                # 4+ parts (e.g. alex.brandnest-black.vercel.app) is a card subdomain
+                if len(parts) >= 4:
+                    return parts[0]
+                return None
+
+        # 7. Fallback for generic domains with 3+ parts (e.g. raj.hostingdomain.com)
         parts = host.split('.')
         if len(parts) >= 3 and not parts[-1].isdigit():
             if parts[-2] in ('co', 'com', 'org', 'net', 'edu', 'gov') and len(parts) >= 4:
