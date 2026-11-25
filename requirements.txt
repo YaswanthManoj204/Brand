@@ -1,0 +1,11 @@
+Django>=6.1,<6.2
+djangorestframework>=3.18,<4.0
+django-cors-headers>=4.9,<5.0
+django-jazzmin>=3.0,<4.0
+pillow>=13.0,<14.0
+qrcode>=8.2,<9.0
+psycopg[binary]>=3.3,<4.0
+dj-database-url>=3.1,<4.0
+whitenoise>=6.12,<7.0
+django-storages[s3]>=1.14,<2.0
+boto3>=1.44,<2.0

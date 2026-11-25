@@ -1,0 +1,19 @@
+# Exclude local development artifacts from Vercel deployment uploads
+venv/
+.git/
+.gitignore
+*.sqlite3
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+backend/cloudflared.log
+backend/.tunnel_url
+backend/.tunnel_pid
+run.sh
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.DS_Store
+
