@@ -1770,7 +1770,7 @@ class FrontendFlowTests(TestCase):
         self.assertIn('Arjun Robotics Labs', admin_email.subject)
         self.assertIn('Obsidian Black', admin_email.body)
         self.assertIn('Gold', admin_email.body)
-        self.assertIn(f"http://{card.slug}.localhost", admin_email.body)
+        self.assertIn(f"/card/{card.slug}/", admin_email.body)
 
         # Verify Client received Order Placed confirmation email to their login/signup email
         client_order_emails = [m for m in mail.outbox if 'arjun.innovations@gmail.com' in m.to]
@@ -2549,13 +2549,14 @@ class FrontendFlowTests(TestCase):
 
         req_local = rf.get('/card/raj/', HTTP_HOST='192.168.1.34:8000')
         share_url_local = get_shareable_url(req_local, f'/card/{card.slug}/')
-        self.assertEqual(share_url_local, 'http://raj.localhost:8000/')
+        expected_lan = get_lan_ip() or '192.168.1.34'
+        self.assertEqual(share_url_local, f'http://{expected_lan}:8000/card/raj/')
 
         # 2. Verify Card Preview Page displays the local server link
         self.client.force_login(user)
         preview_res = self.client.get(reverse('card_preview', kwargs={'card_id': card.card_id}), HTTP_HOST='localhost:8000')
         self.assertEqual(preview_res.status_code, 200)
-        self.assertContains(preview_res, 'http://raj.localhost:8000/')
+        self.assertContains(preview_res, f'http://{expected_lan}:8000/card/raj/')
         self.assertContains(preview_res, 'Shareable Subdomain Link:')
 
         # 3. Verify Subdomain Routing Middleware on localhost subdomain (http://raj.localhost:8000/)

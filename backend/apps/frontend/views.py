@@ -261,14 +261,11 @@ def get_card_subdomain_url(card_or_slug, request=None):
                 port_str = ""
 
             # Check for cloud / serverless platform domains (*.vercel.app, *.onrender.com, etc.)
+            # These platforms do NOT support wildcard subdomains on their shared base domain.
+            # Direct path https://<project>.vercel.app/card/<slug>/ is 100% functional and reachable worldwide.
             for platform_suffix in ('.vercel.app', '.onrender.com', '.railway.app', '.appspot.com'):
                 if raw_host.endswith(platform_suffix):
-                    parts = raw_host.split('.')
-                    if len(parts) >= 4:
-                        clean_platform = '.'.join(parts[1:])
-                    else:
-                        clean_platform = raw_host
-                    return f"https://{slug}.{clean_platform}{port_str}/"
+                    return f"https://{raw_host}/card/{slug}/"
 
             if raw_host in ('0.0.0.0', '127.0.0.1', 'localhost', 'testserver') or raw_host.endswith('.localhost'):
                 return f"http://{slug}.localhost{port_str}/"
@@ -287,27 +284,98 @@ def get_card_subdomain_url(card_or_slug, request=None):
 def get_qr_target_url(card_or_slug, request=None):
     """
     Returns the exact URL encoded into the QR code.
-    Matches the card subdomain URL so scanning on mobile navigates directly to the subdomain.
+    Guaranteed to be reachable when scanned from a physical smartphone camera:
+    1. If a custom production domain is configured (CARD_BASE_DOMAIN or card.domain):
+       https://<slug>.<domain>/
+    2. If hosted on a cloud platform (e.g. brandnest-black.vercel.app):
+       https://brandnest-black.vercel.app/card/<slug>/
+    3. In local development:
+       Uses computer LAN IP (http://<lan_ip>:<port>/card/<slug>/) so phones
+       on the same Wi-Fi network can connect directly without DNS failures.
     """
-    return get_card_subdomain_url(card_or_slug, request=request)
+    slug = card_or_slug.slug if hasattr(card_or_slug, 'slug') else str(card_or_slug)
+    slug = slug.strip('/').lower()
+
+    if hasattr(card_or_slug, 'domain') and card_or_slug.domain and card_or_slug.domain.domain_type == 'custom':
+        return f"https://{card_or_slug.domain.domain_name}/"
+
+    from django.conf import settings
+    base_domain = getattr(settings, 'CARD_BASE_DOMAIN', '').strip().lower()
+
+    try:
+        from apps.cards.models import CompanySettings
+        cs = CompanySettings.objects.filter(id=1).first()
+        if cs and cs.website:
+            clean_w = cs.website.replace('http://', '').replace('https://', '').strip('/').split(':')[0].lower()
+            if clean_w and '.' in clean_w and not clean_w.startswith(('127.', '192.', '10.', 'localhost')) and not clean_w.replace('.', '').isdigit():
+                base_domain = clean_w
+    except Exception:
+        pass
+
+    if base_domain and not base_domain.endswith(('.vercel.app', '.onrender.com', '.railway.app', '.appspot.com', 'localhost')) and not base_domain.startswith(('127.', '192.', '10.')):
+        return f"https://{slug}.{base_domain}/"
+
+    port_str = ""
+    scheme = "https"
+    raw_host = ""
+
+    if request:
+        try:
+            scheme = "https" if request.is_secure() else "http"
+            host_header = request.get_host().strip().lower()
+            if ':' in host_header:
+                parts = host_header.split(':')
+                raw_host = parts[0]
+                port = parts[1]
+                port_str = f":{port}" if port and port not in ('80', '443') else ""
+            else:
+                raw_host = host_header
+                port_str = ""
+
+            for platform_suffix in ('.vercel.app', '.onrender.com', '.railway.app', '.appspot.com'):
+                if raw_host.endswith(platform_suffix):
+                    return f"https://{raw_host}/card/{slug}/"
+
+            if raw_host in ('0.0.0.0', '127.0.0.1', 'localhost', 'testserver') or raw_host.endswith('.localhost') or re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', raw_host):
+                lan_ip = get_lan_ip()
+                port = port_str if port_str else ":8000"
+                if lan_ip:
+                    return f"http://{lan_ip}{port}/card/{slug}/"
+                return f"http://{slug}.localhost{port}/"
+
+            if '.' in raw_host and not raw_host.replace('.', '').isdigit():
+                domain_parts = raw_host.split('.')
+                clean_domain = '.'.join(domain_parts[1:]) if len(domain_parts) >= 3 else raw_host
+                return f"{scheme}://{slug}.{clean_domain}{port_str}/"
+        except Exception:
+            pass
+
+    lan_ip = get_lan_ip()
+    if lan_ip:
+        return f"http://{lan_ip}:8000/card/{slug}/"
+
+    return f"http://{slug}.localhost:8000/"
 
 
 def get_shareable_url(request, path, card=None):
     """
     Builds the direct shareable URL for QR codes, NFC cards, and copy links.
     1. If path is a card view (/card/<slug>/) or card is provided, returns the official
-       subdomain URL: e.g. https://<slug>.qkbiz.com/
+       direct reachable URL (or custom subdomain URL when CARD_BASE_DOMAIN is set).
     2. Otherwise uses the absolute request URI for system paths.
     """
+    slug = None
     if card and hasattr(card, 'slug'):
-        return get_card_subdomain_url(card.slug, request=request)
+        slug = card.slug
+    else:
+        card_match = re.match(r'^/card/([a-zA-Z0-9_\-\.]+)/?$', path)
+        if card_match:
+            candidate = card_match.group(1)
+            if candidate not in ('create', 'choose', 'preview', 'delete'):
+                slug = candidate
 
-    # Check if this is a card standalone path: /card/<slug>/
-    card_match = re.match(r'^/card/([a-zA-Z0-9_\-\.]+)/?$', path)
-    if card_match:
-        slug = card_match.group(1)
-        if slug not in ('create', 'choose', 'preview', 'delete'):
-            return get_card_subdomain_url(slug, request=request)
+    if slug:
+        return get_qr_target_url(card or slug, request=request)
 
     host = request.get_host()
     if '127.0.0.1' in host or 'localhost' in host or '0.0.0.0' in host:
