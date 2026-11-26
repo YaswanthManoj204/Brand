@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
     :root {
       --bg: #F2F2F2;
@@ -73,21 +75,23 @@
     .top {
       position: sticky;
       top: 16px;
-      z-index: 30;
-      padding: 0 20px
+      z-index: 100;
+      padding: 0 20px;
     }
 
     .nav {
       max-width: 1200px;
       margin: 0 auto;
-      background: rgba(255, 255, 255, .88);
-      backdrop-filter: blur(14px);
+      background: rgba(255, 255, 255, .90);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-radius: 999px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 10px 10px 22px;
-      box-shadow: 0 1px 0 var(--line)
+      padding: 8px 12px 8px 22px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05), 0 1px 0 var(--line);
+      position: relative;
     }
 
     .logo {
@@ -96,7 +100,9 @@
       gap: 10px;
       font-weight: 700;
       font-size: 20px;
-      letter-spacing: -.03em
+      letter-spacing: -.03em;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .mark {
@@ -105,7 +111,8 @@
       border-radius: 9px;
       background: var(--ink);
       position: relative;
-      overflow: hidden
+      overflow: hidden;
+      flex-shrink: 0;
     }
 
     .mark::before {
@@ -115,7 +122,7 @@
       top: 6px;
       width: 6px;
       height: 18px;
-      background: linear-gradient(#fff, #8a8b90)
+      background: linear-gradient(#fff, #8a8b90);
     }
 
     .mark::after {
@@ -126,25 +133,39 @@
       width: 9px;
       height: 12px;
       background: linear-gradient(#fff, #8a8b90);
-      clip-path: polygon(0 0, 100% 40%, 100% 100%, 0 100%)
+      clip-path: polygon(0 0, 100% 40%, 100% 100%, 0 100%);
     }
 
-    .nav ul {
+    .nav-links {
       display: flex;
-      gap: 34px;
+      gap: 32px;
       list-style: none;
       font-size: 15px;
       font-weight: 500;
-      color: #55565B
+      color: #55565B;
+      align-items: center;
     }
 
-    .nav ul a:hover {
-      color: var(--ink)
+    .nav-links a {
+      transition: color .15s ease;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover {
+      color: var(--ink);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
     .pill {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       font: 600 15.5px var(--f);
       padding: 13px 24px;
@@ -153,25 +174,140 @@
       cursor: pointer;
       background: var(--ink);
       color: #fff;
-      transition: background .2s
+      transition: all .2s ease;
+      white-space: nowrap;
+      text-decoration: none;
     }
 
     .pill:hover {
-      background: #34363c
+      background: #34363c;
+      color: #fff;
     }
 
     .pill.light {
       background: #fff;
-      color: var(--ink)
+      color: var(--ink);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
     }
 
     .pill.light:hover {
-      background: var(--mist)
+      background: var(--mist);
     }
 
     .pill.sm {
-      padding: 10px 20px;
-      font-size: 14.5px
+      padding: 9px 18px;
+      font-size: 14px;
+    }
+
+    /* Mobile Hamburger Button */
+    .mobile-toggle {
+      display: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #F1F2F4;
+      border: 0;
+      color: var(--ink);
+      font-size: 20px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s ease, transform .15s ease;
+      flex-shrink: 0;
+      padding: 0;
+    }
+
+    .mobile-toggle:hover {
+      background: #E4E5E8;
+    }
+
+    .mobile-toggle:active {
+      transform: scale(0.95);
+    }
+
+    /* Mobile Slide-Down Menu Drawer */
+    .mobile-menu-drawer {
+      display: none;
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.16), 0 0 0 1px var(--line);
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity .25s ease, transform .25s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .mobile-menu-drawer.open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .mobile-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0;
+      margin: 0;
+    }
+
+    .mobile-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 15.5px;
+      font-weight: 500;
+      color: var(--ink);
+      text-decoration: none;
+      transition: background .15s ease;
+    }
+
+    .mobile-nav-link:hover, .mobile-nav-link:active {
+      background: var(--mist);
+      color: #0084FF;
+    }
+
+    .mobile-nav-link i {
+      font-size: 18px;
+      width: 22px;
+      color: #71717A;
+    }
+
+    .mobile-nav-link:hover i {
+      color: #0084FF;
+    }
+
+    .mobile-menu-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 8px 6px;
+    }
+
+    .mobile-user-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    .mobile-auth-row {
+      display: flex;
+      gap: 10px;
+      padding: 8px 6px 4px;
     }
 
     /* hero */
@@ -222,180 +358,212 @@
       flex-wrap: wrap
     }
 
-    /* showcase */
+    /* Hero Showcase: Digital Smart Card & Physical Contactless NFC Card */
     .showcase {
       position: relative;
-      max-width: 1000px;
-      height: 540px;
-      margin: 72px auto 0
+      max-width: 980px;
+      margin: 64px auto 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .url {
-      position: absolute;
-      left: 50%;
-      top: 0;
-      transform: translateX(-50%);
-      z-index: 3;
       background: #fff;
       border-radius: 999px;
-      padding: 12px 26px 12px 18px;
-      display: flex;
+      padding: 10px 22px 10px 16px;
+      display: inline-flex;
       align-items: center;
-      gap: 12px;
-      font-size: 17px;
-      box-shadow: 0 1px 0 var(--line), 0 14px 30px -14px rgba(0, 0, 0, .25)
+      gap: 10px;
+      font-size: 15.5px;
+      font-weight: 500;
+      box-shadow: 0 1px 0 var(--line), 0 14px 28px -12px rgba(0, 0, 0, .14);
+      margin-bottom: 32px;
+      max-width: 92%;
     }
 
-    .url::before {
-      content: "";
-      width: 14px;
-      height: 16px;
-      border-radius: 4px;
-      background: var(--ink)
-    }
-
-    .sc-browser {
-      position: absolute;
-      left: 0;
-      top: 92px;
-      width: 74%;
-      height: 430px;
-      background: #fff;
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .35), 0 0 0 1px var(--line)
-    }
-
-    .sc-browser .hd {
-      height: 34px;
-      background: #F0F0F1;
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      padding: 0 16px
-    }
-
-    .sc-browser .hd i {
-      width: 9px;
-      height: 9px;
+    .url-dot {
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      background: #CFCFD2
+      background: #22C55E;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.22);
+      flex-shrink: 0;
     }
 
-    .sc-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 28px;
-      font-size: 14px;
-      color: #6B6C72
-    }
-
-    .sc-nav b {
-      color: var(--ink);
-      font-size: 16px
-    }
-
-    .sc-nav span {
-      display: flex;
-      gap: 20px
-    }
-
-    .sc-hero {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 24px;
-      padding: 18px 28px 0
-    }
-
-    .sc-hero h5 {
-      font-size: 30px;
-      font-weight: 600;
-      letter-spacing: -.03em;
-      line-height: 1.1
-    }
-
-    .sc-hero p {
-      color: #6B6C72;
-      font-size: 14px;
-      margin: 12px 0 18px;
-      max-width: 30ch
-    }
-
-    .sc-hero .pill {
-      padding: 10px 18px;
-      font-size: 13.5px
-    }
-
-    .sc-form {
-      background: var(--mist);
-      border-radius: 16px;
-      padding: 16px;
-      display: grid;
-      gap: 9px;
+    .url-badge {
+      background: #F1F5F9;
+      color: #0F172A;
       font-size: 12px;
-      color: #6B6C72
-    }
-
-    .sc-form i {
-      display: block;
-      height: 30px;
-      border-radius: 9px;
-      background: #fff;
-      box-shadow: 0 0 0 1px var(--line)
-    }
-
-    .sc-form em {
-      font-style: normal;
-      color: var(--ink);
       font-weight: 600;
-      font-size: 13.5px
+      padding: 3px 9px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 4px;
     }
 
-    .sc-form u {
+    .sc-duo-stage {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 36px;
+      position: relative;
+    }
+
+    /* Phone Digital Card Mockup */
+    .sc-hero-phone {
+      width: 270px;
+      height: 480px;
+      background: #0B0B0D;
+      border-radius: 40px;
+      padding: 10px;
+      box-shadow: 0 0 0 2px #38BDF8, 0 30px 60px -20px rgba(0,0,0,0.45);
+      transform: rotate(-2deg);
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .sc-hero-phone:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+
+    .sc-hero-phone .ph {
+      background: #fff;
+      height: 100%;
+      border-radius: 32px;
+      padding: 24px 16px 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .ph-header .av {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      background: linear-gradient(135deg, #0084FF 0%, #7C3AED 100%);
+      box-shadow: 0 4px 14px rgba(0, 132, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 24px;
+    }
+
+    .ph-header h4 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    .ph-header span {
+      font-size: 12.5px;
+      color: #64748B;
+      font-weight: 500;
       display: block;
-      height: 30px;
-      border-radius: 99px;
-      background: var(--blue);
-      text-decoration: none
     }
 
-    .sc-tiles {
+    .ph-actions {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      padding: 22px 28px
+      gap: 6px;
+      margin: 14px 0 10px;
     }
 
-    .sc-tiles i {
-      height: 70px;
-      border-radius: 14px
+    .ph-btn {
+      background: #F1F5F9;
+      border-radius: 10px;
+      padding: 8px 0;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
     }
 
-    .sc-tiles i:nth-child(1) {
-      background: var(--blue)
+    .ph-btn i {
+      font-size: 14px;
+      color: #0084FF;
     }
 
-    .sc-tiles i:nth-child(2) {
-      background: var(--yellow)
+    .ph-save-btn {
+      background: #0084FF;
+      color: #fff;
+      font-weight: 600;
+      font-size: 12.5px;
+      padding: 9px 0;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 6px;
+      text-decoration: none;
     }
 
-    .sc-tiles i:nth-child(3) {
-      background: var(--red)
+    .ph-footer-qr {
+      background: #F8FAFC;
+      border-radius: 14px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      font-size: 11px;
+      color: #64748B;
+      border: 1px solid #E2E8F0;
     }
 
-    .sc-phone {
-      position: absolute;
-      right: 2%;
-      top: 70px;
-      width: 250px;
-      height: 450px;
+    .ph-footer-qr i.qr-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: conic-gradient(var(--ink) 25%, #fff 0 50%, var(--ink) 0 75%, #fff 0) 0 0/8px 8px;
+      flex-shrink: 0;
+    }
+
+    /* Physical NFC Hardware Showcase Card */
+    .sc-hero-nfc {
+      width: 350px;
+      height: 220px;
+      background: linear-gradient(135deg, #181920 0%, #07080A 100%);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 20px;
+      padding: 22px 24px;
+      box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
       transform: rotate(3deg);
-      background: #0b0b0d;
-      border-radius: 38px;
-      padding: 9px;
-      box-shadow: 0 0 0 2px #B65F3F, 0 40px 60px -24px rgba(0, 0, 0, .55);
-      z-index: 2
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #fff;
+      position: relative;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .sc-hero-nfc:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+
+    .sc-hero-nfc::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.15), transparent 70%);
+      pointer-events: none;
     }
 
     /* overview table */
@@ -1132,91 +1300,186 @@
     }
 
     @media (max-width:980px) {
-      .nav ul {
-        display: none
+      .nav-links {
+        display: none !important;
+      }
+
+      .mobile-toggle {
+        display: inline-flex;
+      }
+
+      .mobile-menu-drawer {
+        display: block;
+      }
+
+      .desktop-only {
+        display: none !important;
       }
 
       .overview,
       .flow .head {
         grid-template-columns: 1fr;
-        gap: 36px
+        gap: 36px;
       }
 
       .card.big,
       .card.sm {
-        grid-column: span 6
+        grid-column: span 6;
       }
 
       .card.big {
-        min-height: 0
+        min-height: 0;
+      }
+    }
+
+    @media (max-width:768px) {
+      .sc-duo-stage {
+        flex-direction: column;
+        gap: 28px;
       }
 
-      .sc-browser {
-        width: 100%
+      .sc-hero-phone {
+        width: 260px;
+        height: 460px;
+        transform: none !important;
       }
 
-      .sc-phone {
-        width: 200px;
-        height: 370px;
-        top: 210px;
-        right: 0
-      }
-
-      .showcase {
-        height: 620px
+      .sc-hero-nfc {
+        width: 100%;
+        max-width: 320px;
+        height: 200px;
+        transform: none !important;
       }
     }
 
     @media (max-width:620px) {
       body {
-        font-size: 16px
+        font-size: 16px;
       }
 
       .wrap {
-        padding: 0 20px
+        padding: 0 16px;
       }
 
-      .card {
-        padding: 26px;
-        border-radius: 26px
+      .top {
+        padding: 0 12px;
+        top: 10px;
       }
 
-      .stage {
-        margin: 30px -26px -26px
+      .nav {
+        padding: 6px 8px 6px 14px;
       }
 
-      .sc-hero {
-        grid-template-columns: 1fr
+      .logo {
+        font-size: 17px;
+        gap: 8px;
       }
 
-      .sc-form {
-        display: none
+      .nav-actions {
+        gap: 6px !important;
       }
 
-      .sc-phone {
-        width: 170px;
-        height: 320px;
-        top: 300px
+      .pill {
+        white-space: nowrap !important;
+      }
+
+      .pill.sm {
+        padding: 7px 14px;
+        font-size: 13.5px;
+      }
+
+      .nav-login-btn {
+        padding: 7px 10px !important;
+        background: transparent !important;
+        font-size: 13.5px !important;
+      }
+
+      .nav-login-btn:hover {
+        background: rgba(0,0,0,0.05) !important;
+      }
+
+      .nav-signup-btn {
+        padding: 7px 14px !important;
+        font-size: 13px !important;
+      }
+
+      .mobile-toggle {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+      }
+
+      .mobile-menu-drawer {
+        left: 12px;
+        right: 12px;
+        padding: 12px;
+        border-radius: 20px;
+      }
+
+      .statement {
+        font-size: clamp(26px, 6.5vw, 36px);
+      }
+
+      .hero {
+        padding: 60px 0 0;
+      }
+
+      .hero-actions {
+        margin-top: 28px;
+        gap: 10px;
+      }
+
+      .hero-actions .pill {
+        width: 100%;
+        justify-content: center;
       }
 
       .showcase {
-        height: 660px
+        margin-top: 40px;
+      }
+
+      .url {
+        font-size: 13.5px;
+        padding: 8px 16px 8px 12px;
+        margin-bottom: 24px;
+      }
+
+      .card {
+        padding: 24px 20px;
+        border-radius: 24px;
+      }
+
+      .stage {
+        margin: 24px -20px -20px;
       }
 
       .step em {
-        font-size: 16px
+        font-size: 16px;
       }
 
       .step small {
-        display: none
+        display: none;
       }
 
       .step {
-        height: 70px
+        height: 70px;
       }
 
       .band {
-        padding: 64px 22px
+        padding: 48px 16px;
+      }
+    }
+
+    @media (max-width:370px) {
+      .nav-login-btn {
+        display: none !important;
+      }
+      .logo {
+        font-size: 16px;
+      }
+      .pill.sm {
+        padding: 6px 12px;
+        font-size: 12.5px;
       }
     }
   </style>
@@ -1226,33 +1489,97 @@
 
   <div class="top">
     <nav class="nav" aria-label="Main">
-      <a href="{% url 'landing' %}" class="logo"><span class="mark"></span>BrandNest</a>
-      <ul>
+      <a href="{% url 'landing' %}" class="logo">
+        <span class="mark"></span>
+        <span class="logo-text">BrandNest</span>
+      </a>
+
+      <ul class="nav-links">
         <li><a href="#build">Digital &amp; NFC Cards</a></li>
         <li><a href="{% url 'card_choose_plan' %}">Create Card</a></li>
         <li><a href="{% url 'card_list' %}">Manage Cards</a></li>
         <li><a href="{% url 'enterprise_checkout' %}">Enterprise Cards</a></li>
       </ul>
-      <div style="display:flex;align-items:center;gap:10px;">
+
+      <div class="nav-actions">
         {% if user.is_authenticated %}
-        {% if user.is_staff or user.is_superuser %}
-        <a class="pill sm dark" href="/admin/" target="_blank" style="background:#0F172A;color:#fff;text-decoration:none;">
-          <i class="bi bi-shield-lock-fill"></i> Admin
-        </a>
-        {% endif %}
-        <a class="pill sm" href="{% url 'card_list' %}" style="text-decoration:none;background:#0084FF;color:#fff;">
-          <i class="bi bi-person-badge"></i> My Cards
-        </a>
-        <span style="font-size:14.5px;color:var(--ink);font-weight:600;display:inline-flex;align-items:center;gap:6px;">
-          <i class="bi bi-person-circle text-primary"></i> {{ user.first_name|default:user.username }}
-        </span>
-        <a class="pill sm light" href="{% url 'logout' %}">Sign Out</a>
+          {% if user.is_staff or user.is_superuser %}
+          <a class="pill sm dark desktop-only" href="/admin/" target="_blank" style="background:#0F172A;color:#fff;">
+            <i class="bi bi-shield-lock-fill"></i> Admin
+          </a>
+          {% endif %}
+          <a class="pill sm" href="{% url 'card_list' %}" style="background:#0084FF;color:#fff;">
+            <i class="bi bi-person-badge"></i> <span>My Cards</span>
+          </a>
+          <a class="pill sm light desktop-only" href="{% url 'logout' %}">Sign Out</a>
         {% else %}
-        <a class="pill sm light" href="{% url 'login' %}">Log In</a>
-        <a class="pill sm" href="{% url 'signup' %}">Sign Up</a>
+          <a class="pill sm light nav-login-btn" href="{% url 'login' %}">Log In</a>
+          <a class="pill sm nav-signup-btn" href="{% url 'signup' %}">Sign Up</a>
         {% endif %}
+
+        <button class="mobile-toggle" id="mobileNavToggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false" onclick="toggleMobileMenu()">
+          <i class="bi bi-list" id="toggleIcon"></i>
+        </button>
       </div>
     </nav>
+
+    <!-- Mobile Slide-Down Menu Overlay -->
+    <div class="mobile-menu-drawer" id="mobileMenuDrawer">
+      <ul class="mobile-nav-list">
+        <li>
+          <a href="#build" class="mobile-nav-link" onclick="closeMobileMenu()">
+            <i class="bi bi-credit-card-2-front"></i>
+            <span>Digital &amp; NFC Cards</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'card_choose_plan' %}" class="mobile-nav-link" onclick="closeMobileMenu()">
+            <i class="bi bi-plus-circle"></i>
+            <span>Create New Card</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'card_list' %}" class="mobile-nav-link" onclick="closeMobileMenu()">
+            <i class="bi bi-collection"></i>
+            <span>Manage Cards</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'enterprise_checkout' %}" class="mobile-nav-link" onclick="closeMobileMenu()">
+            <i class="bi bi-building-check"></i>
+            <span>Enterprise Cards</span>
+          </a>
+        </li>
+        <li class="mobile-menu-divider"></li>
+        {% if user.is_authenticated %}
+        <li>
+          <div class="mobile-user-row">
+            <i class="bi bi-person-circle text-primary"></i>
+            <span>{{ user.first_name|default:user.username }}</span>
+          </div>
+        </li>
+        {% if user.is_staff or user.is_superuser %}
+        <li>
+          <a href="/admin/" target="_blank" class="mobile-nav-link text-warning" onclick="closeMobileMenu()">
+            <i class="bi bi-shield-lock-fill"></i>
+            <span>Django Administration</span>
+          </a>
+        </li>
+        {% endif %}
+        <li>
+          <a href="{% url 'logout' %}" class="mobile-nav-link text-danger" onclick="closeMobileMenu()">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Sign Out</span>
+          </a>
+        </li>
+        {% else %}
+        <li class="mobile-auth-row">
+          <a href="{% url 'login' %}" class="pill light sm" style="justify-content:center;flex:1;">Log In</a>
+          <a href="{% url 'signup' %}" class="pill sm" style="justify-content:center;flex:1;">Sign Up</a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
   </div>
 
   <header class="hero">
@@ -1264,30 +1591,59 @@
         <a class="pill light" href="#how">See how it works</a>
       </div>
 
-      <div class="showcase" aria-hidden="true">
-        <div class="url">www.sunrisedental.in</div>
-        <div class="sc-browser">
-          <div class="hd"><i></i><i></i><i></i></div>
-          <div class="sc-nav"><b>Sunrise Dental</b><span><i style="font-style:normal">Services</i><i
-                style="font-style:normal">About</i><i style="font-style:normal">Contact</i></span></div>
-          <div class="sc-hero">
-            <div>
-              <h5>Gentle dental care for the whole family</h5>
-              <p>Book a visit in two minutes. We reply the same day.</p>
-              <a href="{% url 'website_builder' %}" class="pill">Book appointment</a>
-            </div>
-            <div class="sc-form"><em>Enquiry</em><i></i><i></i><u></u></div>
-          </div>
-          <div class="sc-tiles"><i></i><i></i><i></i></div>
+      <div class="showcase">
+        <div class="url">
+          <span class="url-dot"></span>
+          <span>brandnest.me/alexmorgan</span>
+          <span class="url-badge"><i class="bi bi-broadcast"></i> NFC Active</span>
         </div>
-        <div class="sc-phone">
-          <div class="ph">
-            <div class="av"></div>
-            <h4>Dr. Meera Nair</h4>
-            <span>Dentist, Thiruvananthapuram</span>
-            <div class="btns"><span>Call</span><span>Email</span><span>WhatsApp</span></div>
-            <div class="map"></div>
-            <div class="qr"><i></i>Scan to save this card</div>
+
+        <div class="sc-duo-stage">
+          <!-- Live Interactive Phone Preview -->
+          <div class="sc-hero-phone">
+            <div class="ph">
+              <div class="ph-header">
+                <div class="av">
+                  <i class="bi bi-person-fill"></i>
+                </div>
+                <h4>Alex Morgan</h4>
+                <span>Managing Director · BrandNest</span>
+              </div>
+              <div class="ph-actions">
+                <div class="ph-btn"><i class="bi bi-telephone-fill"></i>Call</div>
+                <div class="ph-btn"><i class="bi bi-envelope-fill"></i>Email</div>
+                <div class="ph-btn"><i class="bi bi-whatsapp"></i>WhatsApp</div>
+              </div>
+              <a href="{% url 'card_choose_plan' %}" class="ph-save-btn">
+                <i class="bi bi-person-plus-fill"></i> Save to Contacts
+              </a>
+              <div class="ph-footer-qr">
+                <i class="qr-box"></i>
+                <div>
+                  <strong style="color:var(--ink);display:block;">Instant QR Scan</strong>
+                  <span>Tap or scan to save contact</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Physical Luxury NFC Smart Card -->
+          <div class="sc-hero-nfc">
+            <div class="nfc-top-row">
+              <div class="nfc-chip"></div>
+              <div style="font-size:20px;letter-spacing:2px;color:#D4AF37;">(((•)))</div>
+            </div>
+            <div style="margin:14px 0 10px;">
+              <div style="font-size:11px;letter-spacing:2px;color:#94A3B8;text-transform:uppercase;font-weight:600;margin-bottom:4px;">BrandNest Smart Pass</div>
+              <div style="font-size:19px;font-weight:700;letter-spacing:1.5px;color:#FDE68A;">ALEX MORGAN</div>
+              <div style="font-size:10.5px;color:#CBD5E1;letter-spacing:1px;text-transform:uppercase;margin-top:2px;">FOUNDER &amp; MANAGING DIRECTOR</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#94A3B8;letter-spacing:1px;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">
+              <span style="display:inline-flex;align-items:center;gap:4px;color:#22C55E;">
+                <i class="bi bi-check-circle-fill"></i> CONTACTLESS NFC
+              </span>
+              <span>NTAG216 · 888B</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1429,6 +1785,39 @@
   </main>
 
   <script>
+    function toggleMobileMenu() {
+      var drawer = document.getElementById('mobileMenuDrawer');
+      var icon = document.getElementById('toggleIcon');
+      var btn = document.getElementById('mobileNavToggle');
+      if (!drawer) return;
+      var isOpen = drawer.classList.contains('open');
+      if (isOpen) {
+        drawer.classList.remove('open');
+        if (icon) icon.className = 'bi bi-list';
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      } else {
+        drawer.classList.add('open');
+        if (icon) icon.className = 'bi bi-x-lg';
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    function closeMobileMenu() {
+      var drawer = document.getElementById('mobileMenuDrawer');
+      var icon = document.getElementById('toggleIcon');
+      var btn = document.getElementById('mobileNavToggle');
+      if (drawer) drawer.classList.remove('open');
+      if (icon) icon.className = 'bi bi-list';
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    document.addEventListener('click', function(e) {
+      var topNav = document.querySelector('.top');
+      if (topNav && !topNav.contains(e.target)) {
+        closeMobileMenu();
+      }
+    });
+
     function setNfcTheme(theme, btn) {
       var card = document.getElementById('nfcCardDemo');
       var nameEl = document.getElementById('nfcNameEl');
