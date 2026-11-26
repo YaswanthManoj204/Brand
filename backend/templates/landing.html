@@ -977,41 +977,22 @@
     }
 
     /* overview table */
+    /* overview section */
     .overview {
-      padding: 120px 0 40px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 64px
+      padding: 90px 0 30px;
+      max-width: 820px;
     }
 
     .overview .label {
       color: var(--mute);
       font-size: 16px;
-      margin-bottom: 22px
+      margin-bottom: 18px;
     }
 
     .overview h2 {
       font-size: clamp(24px, 2.7vw, 34px);
       font-weight: 500;
       line-height: 1.28;
-      max-width: 20em
-    }
-
-    .rows {
-      align-self: end
-    }
-
-    .rows div {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 20px 0;
-      border-bottom: 1px solid var(--line);
-      font-size: 16px
-    }
-
-    .rows span {
-      color: var(--mute)
     }
 
     /* bento */
@@ -1034,64 +1015,37 @@
 
     .card.big {
       grid-column: span 3;
-      min-height: 760px
+      min-height: 690px;
     }
 
     .card.dark {
       background: var(--ink);
-      color: #fff
+      color: #fff;
     }
 
     .card.sm {
       grid-column: span 2;
       padding: 28px;
-      background: #FBFBFB
+      background: #FBFBFB;
     }
 
     .card h3 {
       font-size: 32px;
-      margin-bottom: 12px
+      margin-bottom: 12px;
     }
 
     .card>p {
       color: #6B6C72;
-      max-width: 40ch
+      max-width: 40ch;
     }
 
     .dark>p {
-      color: #A9AAB0
-    }
-
-    .feat {
-      list-style: none;
-      margin: 22px 0 28px;
-      display: grid;
-      gap: 10px;
-      font-size: 15.5px
-    }
-
-    .feat li {
-      padding-left: 22px;
-      position: relative
-    }
-
-    .feat li::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: .62em;
-      width: 9px;
-      height: 9px;
-      border-radius: 3px;
-      background: var(--blue)
-    }
-
-    .dark .feat li::before {
-      background: var(--yellow)
+      color: #A9AAB0;
     }
 
     .card .pill {
-      align-self: flex-start
+      align-self: flex-start;
+      margin-top: 22px;
     }
 
     .stage {
@@ -2321,25 +2275,12 @@
         <p class="label">Overview</p>
         <h2>One platform to design your digital card, encode your contactless NFC hardware, and share everywhere.</h2>
       </div>
-      <div class="rows">
-        <div><span>Product Line</span>Digital Smart Business Card &amp; Physical NFC Pass</div>
-        <div><span>Hardware Specs</span>NTAG216 High-Frequency Chip · Precision Laser Engraving</div>
-        <div><span>Subdomain</span>Your own name, instant setup</div>
-        <div><span>Fulfillment</span>Quality tested &amp; express doorstep courier delivery</div>
-      </div>
     </section>
 
     <section class="bento" id="build" aria-label="What you can build">
       <article class="card big">
         <h3>Digital Business Card</h3>
-        <p>A mobile-first digital card for entrepreneurs, consultants and professionals who want to be easy to reach.
-        </p>
-        <ul class="feat">
-          <li>Tap to call, email or message on WhatsApp</li>
-          <li>Google Maps location pin &amp; brochure documents</li>
-          <li>QR code &amp; instant vCard contact download</li>
-          <li>Shareable subdomain link on your own name</li>
-        </ul>
+        <p>A mobile-first digital card for entrepreneurs, consultants and professionals who want to be easy to reach.</p>
         <a class="pill" href="{% url 'card_choose_plan' %}">Build business card</a>
         <div class="stage blue" aria-hidden="true">
           <div class="phone">
@@ -2357,12 +2298,6 @@
       <article class="card big dark">
         <h3>Physical NFC Smart Card</h3>
         <p>A luxury matte contactless hardware pass with precision laser engraving, metallic foil accents, and instant phone tap.</p>
-        <ul class="feat">
-          <li>Instant contactless tap for iPhone &amp; Android</li>
-          <li>UV laser engraved typography &amp; metallic foil accents</li>
-          <li>High-speed NTAG216 contactless smart chip (888 Bytes)</li>
-          <li>Doorstep express courier shipping with live tracking</li>
-        </ul>
         <a class="pill light" href="{% url 'card_choose_plan' %}">Order physical NFC card</a>
         <div class="stage night">
           <div class="nfc-finish-tabs" role="group" aria-label="Physical Card Theme">
