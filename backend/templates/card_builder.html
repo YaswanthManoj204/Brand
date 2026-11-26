@@ -39,6 +39,11 @@
       padding: 0
     }
 
+    html {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+
     body {
       font-family: var(--f);
       background: var(--bg);
@@ -46,7 +51,9 @@
       font-size: 16.5px;
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
-      position: relative
+      position: relative;
+      overflow-x: hidden;
+      max-width: 100vw;
     }
 
     body::before {
@@ -2248,137 +2255,440 @@
 
     @media (max-width:1120px) {
       .layout {
-        grid-template-columns: 1fr
+        grid-template-columns: minmax(0, 1fr);
+        width: 100%;
+        max-width: 100%;
       }
 
       .aside {
         position: static;
-        margin-top: 40px
+        margin-top: 40px;
+        width: 100%;
+        max-width: 100%;
       }
 
       .phone-wrapper {
         width: 100%;
-        max-width: 390px
+        max-width: 380px;
       }
     }
 
     @media (max-width:880px) {
       .nav ul {
-        display: none
+        display: none;
       }
 
       .wallet-main-grid {
         grid-template-columns: 1fr;
-        gap: 32px
+        gap: 32px;
       }
 
       .wallet-pass-card,
       .btn-wallet-action {
-        max-width: 100%
+        max-width: 100%;
       }
 
       #walletStudioContainer {
-        padding: 24px 20px
+        padding: 24px 20px;
       }
     }
 
     @media (max-width:640px) {
       .top {
-        padding: 0 12px;
-        top: 10px
+        padding: 0 10px;
+        top: 10px;
       }
 
       .nav {
-        padding: 8px 8px 8px 16px
+        padding: 6px 8px 6px 14px;
+        gap: 6px;
       }
 
       .logo {
-        font-size: 18px
+        font-size: 16px;
+        gap: 7px;
+      }
+
+      .mark {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        flex-shrink: 0;
       }
 
       .pill.sm {
-        padding: 7px 14px;
-        font-size: 13px
-      }
-
-      .intro {
-        padding: 30px 0 20px
-      }
-
-      .back {
-        margin-bottom: 16px
-      }
-
-      .intro h1 {
-        font-size: 24px;
-        line-height: 1.3
-      }
-
-      .steps {
-        margin-top: 16px;
-        gap: 8px
-      }
-
-      .steps span {
+        padding: 7px 11px;
         font-size: 13px;
-        padding: 6px 14px 6px 6px
+        white-space: nowrap !important;
       }
 
       .wrap {
-        padding: 0 14px
+        padding: 0 12px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
       }
 
+      .intro {
+        padding: 24px 0 16px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .back {
+        margin-bottom: 14px;
+      }
+
+      .intro h1 {
+        font-size: 21px;
+        line-height: 1.3;
+        word-break: break-word;
+      }
+
+      .intro h1 b {
+        font-size: 14.5px;
+        display: block;
+        margin-top: 4px;
+        font-weight: 500;
+        color: var(--mute);
+      }
+
+      /* Step Tabs */
+      .steps {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 8px;
+        margin-top: 14px;
+        width: 100%;
+        max-width: 100%;
+        padding-bottom: 6px;
+      }
+
+      .steps::-webkit-scrollbar {
+        display: none;
+      }
+
+      .steps span {
+        font-size: 12px;
+        padding: 5px 12px 5px 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .steps i {
+        width: 20px;
+        height: 20px;
+        font-size: 10.5px;
+        flex-shrink: 0;
+      }
+
+      /* Main Form Panel */
       .panel {
-        padding: 14px 16px 28px;
-        border-radius: 22px
+        padding: 14px 12px 24px;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        overflow-x: hidden;
       }
 
       .sec {
-        padding: 24px 0
+        padding: 20px 0;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
       }
 
       .sec h2 {
-        font-size: 19px
+        font-size: 18px;
+      }
+
+      .sec>p {
+        margin-left: 0;
+        font-size: 13.5px;
+        word-break: break-word;
       }
 
       .g {
         grid-template-columns: 1fr;
-        gap: 14px
+        gap: 12px;
+        width: 100%;
+        max-width: 100%;
       }
 
       .s2,
       .s3,
       .s6 {
-        grid-column: auto
+        grid-column: auto;
       }
 
-      .sec>p {
-        margin-left: 0;
-        font-size: 14px
+      /* Template Layout Wireframes Carousel */
+      .layout-carousel-outer {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+      }
+
+      .layout-carousel-track {
+        width: 100%;
+        max-width: 100%;
+        padding: 4px 2px 12px;
+        gap: 10px;
+      }
+
+      .layout-card-wireframe {
+        flex: 0 0 95px;
+        width: 95px;
+      }
+
+      .wf-preview {
+        height: 120px;
+      }
+
+      /* Template Asset Controls */
+      .template-assets-control-card {
+        padding: 12px 10px;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .assets-control-header {
+        margin-bottom: 10px;
+      }
+
+      .assets-control-title {
+        font-size: 14px;
+      }
+
+      .assets-control-subtitle {
+        font-size: 12px;
+        word-break: break-word;
+      }
+
+      .assets-toggles-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .asset-toggle-card {
+        padding: 10px 10px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        gap: 8px;
+      }
+
+      .asset-toggle-info {
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .asset-name {
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+      }
+
+      .asset-desc {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+      }
+
+      /* Company & Role Reorder Box */
+      .role-title-reorder-box {
+        padding: 14px 10px;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .role-title-header {
+        gap: 8px;
+      }
+
+      .role-title-heading-info {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .role-title-heading-text {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .role-title-heading-text h4 {
+        font-size: 13px;
+        line-height: 1.3;
+        word-break: break-word;
+      }
+
+      .role-title-heading-text p {
+        font-size: 11.5px;
+        word-break: break-word;
+      }
+
+      .role-title-card-item {
+        padding: 10px 10px;
+        border-radius: 12px;
+        gap: 8px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .role-card-content {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .role-card-content input {
+        font-size: 13.5px;
+        padding: 9px 10px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .role-card-badge-pill {
+        font-size: 10.5px;
+        padding: 2px 7px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+      }
+
+      /* Banner Orientation */
+      .banner-orientation-toggle {
+        display: flex !important;
+        width: 100% !important;
+        gap: 4px !important;
+        padding: 3px !important;
+        box-sizing: border-box !important;
+      }
+
+      .btn-banner-aspect {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        padding: 6px 4px !important;
+        font-size: 11px !important;
+        justify-content: center !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+      }
+
+      /* Form inputs & textareas */
+      input[type=text],
+      input[type=email],
+      input[type=tel],
+      input[type=url],
+      textarea {
+        font-size: 14px;
+        padding: 10px 12px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .btn-add-dynamic-item {
+        padding: 11px 16px;
+        font-size: 13.5px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      /* Package submit grid & Checkout cards */
+      .submit-packages-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .pkg-card {
+        padding: 16px 14px !important;
+        border-radius: 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+      }
+
+      .pkg-card button.pill {
+        width: 100% !important;
+        padding: 12px 14px !important;
+        font-size: 13px !important;
+        white-space: nowrap !important;
       }
 
       .submit .pill {
         width: 100%;
         padding: 14px;
-        font-size: 15px
+        font-size: 15px;
       }
 
+      /* Preview Stage & Phone Mockup */
       .stage {
-        padding: 20px 10px 16px;
-        border-radius: 28px;
-        min-height: auto
+        padding: 16px 8px 14px;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      .stage .cap {
+        font-size: 12px;
+        padding: 5px 12px;
+        margin: 0 auto 12px;
+        display: table;
       }
 
       .phone-wrapper {
         width: 100%;
-        max-width: 360px;
-        height: 680px;
-        border-radius: 38px
+        max-width: min(330px, calc(100vw - 44px));
+        height: 620px;
+        margin: 12px auto 0;
+        border-radius: 36px;
+        box-sizing: border-box;
       }
 
       footer .wrap {
         height: auto;
-        padding: 24px 16px
+        padding: 24px 16px;
+      }
+    }
+
+    @media (max-width: 375px) {
+      .phone-wrapper {
+        max-width: 295px;
+        height: 560px;
+      }
+      .logo {
+        font-size: 15px;
+      }
+      .pill.sm {
+        padding: 6px 9px;
+        font-size: 12px;
       }
     }
 
@@ -4140,7 +4450,7 @@
         {% endif %}
       </div>
       {% else %}
-      <div class="submit-packages-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));gap:18px;margin-top:24px;">
+      <div class="submit-packages-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr));gap:18px;margin-top:24px;">
         <!-- Option 1: Digital Card (₹499) -->
         <div class="pkg-card" style="background:#ffffff;border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 6px 20px rgba(15,23,42,0.03);display:flex;flex-direction:column;justify-content:space-between;">
           <div>
