@@ -33,16 +33,11 @@
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-3 mt-3 mt-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link text-white-50 hover-light" href="{% url 'landing' %}#modules">Modules</a>
+                        <a class="nav-link text-white-50 hover-light" href="{% url 'landing' %}#build">Digital &amp; NFC Cards</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white-50 hover-light" href="{% url 'card_builder' %}">
-                            <i class="bi bi-person-vcard me-1 text-primary"></i> Business Card
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white-50 hover-light" href="{% url 'enterprise_checkout' %}">
-                            <i class="bi bi-building me-1 text-info"></i> Enterprise Cards
+                        <a class="nav-link text-white-50 hover-light" href="{% url 'card_choose_plan' %}">
+                            <i class="bi bi-plus-circle me-1 text-primary"></i> Create Card
                         </a>
                     </li>
                     {% if user.is_authenticated %}

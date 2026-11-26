@@ -1497,8 +1497,6 @@
       <ul class="nav-links">
         <li><a href="#build">Digital &amp; NFC Cards</a></li>
         <li><a href="{% url 'card_choose_plan' %}">Create Card</a></li>
-        <li><a href="{% url 'card_list' %}">Manage Cards</a></li>
-        <li><a href="{% url 'enterprise_checkout' %}">Enterprise Cards</a></li>
       </ul>
 
       <div class="nav-actions">
@@ -1535,19 +1533,7 @@
         <li>
           <a href="{% url 'card_choose_plan' %}" class="mobile-nav-link" onclick="closeMobileMenu()">
             <i class="bi bi-plus-circle"></i>
-            <span>Create New Card</span>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'card_list' %}" class="mobile-nav-link" onclick="closeMobileMenu()">
-            <i class="bi bi-collection"></i>
-            <span>Manage Cards</span>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'enterprise_checkout' %}" class="mobile-nav-link" onclick="closeMobileMenu()">
-            <i class="bi bi-building-check"></i>
-            <span>Enterprise Cards</span>
+            <span>Create Card</span>
           </a>
         </li>
         <li class="mobile-menu-divider"></li>
