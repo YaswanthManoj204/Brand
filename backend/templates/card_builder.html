@@ -2299,6 +2299,154 @@
       }
     }
 
+    /* Mobile & Tablet Responsive View (<= 1024px, including 777px, 768px, phones) */
+    @media (max-width: 1024px) {
+      /* Section 9: Wallet Design Highlight Card - Reduced size & fully responsive on mobile/tablet */
+      .wallet-design-highlight-card {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 16px 14px !important;
+        border-radius: 18px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        gap: 12px !important;
+        overflow: hidden !important;
+      }
+
+      .wallet-highlight-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .wallet-highlight-tags {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        margin-bottom: 8px !important;
+      }
+
+      .wallet-tag-apple,
+      .wallet-tag-google {
+        font-size: 11px !important;
+        padding: 3px 10px !important;
+        gap: 4px !important;
+      }
+
+      .wallet-tag-feature {
+        font-size: 10px !important;
+        padding: 3px 8px !important;
+      }
+
+      .wallet-highlight-title {
+        font-size: 18px !important;
+        margin-bottom: 4px !important;
+        line-height: 1.3 !important;
+      }
+
+      .wallet-highlight-subtitle {
+        font-size: 12.5px !important;
+        line-height: 1.45 !important;
+        margin-bottom: 12px !important;
+        color: #94A3B8 !important;
+      }
+
+      .wallet-highlight-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+        width: 100% !important;
+      }
+
+      .btn-launch-wallet-design {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 10px 16px !important;
+        font-size: 13px !important;
+        border-radius: 999px !important;
+        box-sizing: border-box !important;
+        white-space: nowrap !important;
+      }
+
+      .wallet-highlight-note {
+        font-size: 11.5px !important;
+        justify-content: center !important;
+        text-align: center !important;
+        color: #94A3B8 !important;
+      }
+
+      .wallet-design-cta-preview {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 2px auto 0 !important;
+        cursor: pointer !important;
+      }
+
+      .mini-pass-preview-mockup {
+        width: 145px !important;
+        height: 100px !important;
+        border-radius: 12px !important;
+        padding: 6px 9px !important;
+        box-sizing: border-box !important;
+      }
+
+      .mini-pass-top {
+        font-size: 7.5px !important;
+        margin-bottom: 3px !important;
+      }
+
+      .mini-pass-strip {
+        height: 24px !important;
+        margin-bottom: 3px !important;
+        border-radius: 5px !important;
+        padding: 2px 4px !important;
+      }
+
+      .mini-pass-strip span {
+        font-size: 6px !important;
+      }
+
+      .mini-pass-lbl {
+        font-size: 6px !important;
+      }
+
+      .mini-pass-name {
+        font-size: 9.5px !important;
+      }
+
+      .mini-pass-qr-badge {
+        padding: 1px 4px !important;
+        font-size: 9px !important;
+        border-radius: 3px !important;
+      }
+
+      .mini-pass-hover-label {
+        font-size: 10px !important;
+        margin-top: 3px !important;
+      }
+
+      /* Picture controls & Font chips row on tablet/mobile */
+      .picture-controls-grid {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+        gap: 10px !important;
+      }
+
+      .font-chips-row {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        gap: 6px !important;
+        padding-bottom: 6px !important;
+      }
+    }
+
     @media (max-width:880px) {
       .nav ul {
         display: none;
@@ -2804,63 +2952,30 @@
         max-width: 100% !important;
       }
 
-      /* Wallet Design Highlight Card Mobile Responsiveness */
+      /* Wallet Design Highlight Card Mobile View - Compact & Perfectly Fitted */
       .wallet-design-highlight-card {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        padding: 20px 16px !important;
-        border-radius: 20px !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-        gap: 18px !important;
-        overflow: hidden !important;
-      }
-
-      .wallet-highlight-content {
-        width: 100% !important;
-        max-width: 100% !important;
+        padding: 14px 12px !important;
+        border-radius: 16px !important;
+        gap: 10px !important;
       }
 
       .wallet-highlight-title {
-        font-size: 20px !important;
+        font-size: 16.5px !important;
       }
 
       .wallet-highlight-subtitle {
-        font-size: 13px !important;
-        line-height: 1.5 !important;
-      }
-
-      .wallet-highlight-tags {
-        flex-wrap: wrap !important;
-        gap: 6px !important;
-      }
-
-      .wallet-tag-apple,
-      .wallet-tag-google,
-      .wallet-tag-feature {
-        font-size: 11px !important;
-        padding: 4px 8px !important;
+        font-size: 12px !important;
+        margin-bottom: 10px !important;
       }
 
       .btn-launch-wallet-design {
-        width: 100% !important;
-        justify-content: center !important;
-        padding: 12px 18px !important;
-        font-size: 13.5px !important;
-      }
-
-      .wallet-design-cta-preview {
-        width: 100% !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        margin: 4px auto 0 !important;
+        padding: 9px 14px !important;
+        font-size: 12.5px !important;
       }
 
       .mini-pass-preview-mockup {
-        width: 190px !important;
-        height: 124px !important;
+        width: 130px !important;
+        height: 90px !important;
       }
 
       footer .wrap {
