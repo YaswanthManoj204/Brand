@@ -1518,6 +1518,12 @@
       border-color: var(--blue);
     }
 
+    .picture-controls-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
     /* Typography Google Fonts Chooser */
     .font-select-control {
       font: 600 13px var(--f);
@@ -2670,6 +2676,171 @@
         margin: 12px auto 0;
         border-radius: 36px;
         box-sizing: border-box;
+      }
+
+      /* Card Typography (Google Fonts) Mobile Responsiveness */
+      .font-chips-row {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        gap: 6px !important;
+        padding-bottom: 6px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .font-chips-row::-webkit-scrollbar {
+        display: none !important;
+      }
+
+      .font-chip {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+      }
+
+      .font-live-preview-box {
+        padding: 14px 12px !important;
+        border-radius: 14px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+      }
+
+      .font-preview-header {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+      }
+
+      .font-preview-tag {
+        font-size: 11.5px !important;
+        word-break: break-word !important;
+      }
+
+      .font-preview-badge {
+        font-size: 10px !important;
+      }
+
+      .font-preview-headline {
+        font-size: 16px !important;
+        line-height: 1.35 !important;
+        word-break: break-word !important;
+        margin: 8px 0 6px !important;
+      }
+
+      .font-preview-alphabet {
+        font-size: 11px !important;
+        word-break: break-all !important;
+        line-height: 1.4 !important;
+        opacity: 0.8 !important;
+      }
+
+      .font-preview-meta-row {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        margin-top: 10px !important;
+      }
+
+      .font-sample-pill {
+        font-size: 10.5px !important;
+        padding: 3px 8px !important;
+      }
+
+      .font-preview-hint {
+        font-size: 10.5px !important;
+      }
+
+      /* Card Accent Colour Mobile Responsiveness */
+      .sw {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        align-items: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .sw label.c {
+        width: 32px !important;
+        height: 32px !important;
+      }
+
+      .sw .custom {
+        margin-left: 2px !important;
+        font-size: 12.5px !important;
+        gap: 5px !important;
+      }
+
+      /* Live Picture Controls Grid (Avatar, Logo, Banner Position) Mobile Responsiveness */
+      .picture-controls-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      /* Wallet Design Highlight Card Mobile Responsiveness */
+      .wallet-design-highlight-card {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 20px 16px !important;
+        border-radius: 20px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        gap: 18px !important;
+        overflow: hidden !important;
+      }
+
+      .wallet-highlight-content {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .wallet-highlight-title {
+        font-size: 20px !important;
+      }
+
+      .wallet-highlight-subtitle {
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+      }
+
+      .wallet-highlight-tags {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+      }
+
+      .wallet-tag-apple,
+      .wallet-tag-google,
+      .wallet-tag-feature {
+        font-size: 11px !important;
+        padding: 4px 8px !important;
+      }
+
+      .btn-launch-wallet-design {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 12px 18px !important;
+        font-size: 13.5px !important;
+      }
+
+      .wallet-design-cta-preview {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin: 4px auto 0 !important;
+      }
+
+      .mini-pass-preview-mockup {
+        width: 190px !important;
+        height: 124px !important;
       }
 
       footer .wrap {
@@ -4158,7 +4329,7 @@
                 <span style="font-size:11.5px;color:var(--muted);"><i class="bi bi-check-circle-fill" style="color:#10B981;"></i> Auto-saved to card</span>
               </div>
               <p style="font-size:12px;color:var(--muted);margin:0 0 10px 0;">Click &amp; drag Profile Photo, Logo, or Banner directly in the phone preview to reposition, scroll to zoom, or use the controls below.</p>
-              <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;">
+              <div class="picture-controls-grid">
                 <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;">
                   <span style="font-size:11px;font-weight:600;color:var(--muted);display:block;">Avatar Position</span>
                   <strong style="font-size:12.5px;color:var(--ink);" id="lblAvatarCoords">{{ card.layout_config.avatar_position|default:'50% 50%' }}</strong>
