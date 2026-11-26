@@ -2301,8 +2301,198 @@
 
     /* Mobile & Tablet Responsive View (<= 1024px, including 777px, 768px, phones) */
     @media (max-width: 1024px) {
-      /* Section 9: Wallet Design Highlight Card - Reduced size & fully responsive on mobile/tablet */
+      /* Reset Section Grid to full-width flex column on tablet/mobile so cells never push width */
+      .g {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+      }
+
+      .s1, .s2, .s3, .s4, .s5, .s6 {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        grid-column: auto !important;
+        box-sizing: border-box !important;
+      }
+
+      .file {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+      }
+
+      /* 1. Card Typography (Google Fonts) Mobile Responsiveness */
+      .typography-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 6px !important;
+        width: 100% !important;
+      }
+
+      .font-select-control {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        font-size: 13px !important;
+      }
+
+      .font-chips-row {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        gap: 6px !important;
+        padding-bottom: 6px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .font-chips-row::-webkit-scrollbar {
+        display: none !important;
+      }
+
+      .font-chip {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        padding: 5px 10px !important;
+        font-size: 11.5px !important;
+      }
+
+      .font-live-preview-box {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 12px 10px !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+      }
+
+      .font-preview-header {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+      }
+
+      .font-preview-tag {
+        font-size: 11px !important;
+        word-break: break-word !important;
+      }
+
+      .font-preview-badge {
+        font-size: 9.5px !important;
+        padding: 2px 6px !important;
+      }
+
+      .font-preview-headline {
+        font-size: 14.5px !important;
+        line-height: 1.35 !important;
+        word-break: break-word !important;
+        margin: 6px 0 4px !important;
+      }
+
+      .font-preview-alphabet {
+        font-size: 10.5px !important;
+        word-break: break-all !important;
+        line-height: 1.35 !important;
+        margin-bottom: 8px !important;
+      }
+
+      .font-preview-meta-row {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+        padding-top: 6px !important;
+      }
+
+      .font-sample-pill {
+        font-size: 9.5px !important;
+        padding: 2px 6px !important;
+      }
+
+      .font-preview-hint {
+        font-size: 9.5px !important;
+        margin-left: 0 !important;
+        width: 100% !important;
+        margin-top: 4px !important;
+      }
+
+      /* 2. Card Accent Colour Mobile Responsiveness */
+      .sw {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .sw label.c {
+        width: 32px !important;
+        height: 32px !important;
+        flex-shrink: 0 !important;
+      }
+
+      .sw .custom {
+        margin-left: 0 !important;
+        font-size: 12.5px !important;
+        gap: 5px !important;
+        flex-shrink: 0 !important;
+      }
+
+      .sw input[type=color] {
+        width: 32px !important;
+        height: 32px !important;
+      }
+
+      /* 3. Live Drag & Zoom Picture Controls Mobile Responsiveness */
+      .picture-controls-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 12px 10px !important;
+        border-radius: 14px !important;
+        overflow: hidden !important;
+      }
+
+      .picture-controls-header {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 4px !important;
+      }
+
+      .picture-controls-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .picture-controls-grid > div {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 10px 10px !important;
+      }
+
+      /* 4. Section 9: Wallet Design Highlight Card - Reduced size & fully responsive on mobile/tablet */
       .wallet-design-highlight-card {
+        display: flex !important;
         flex-direction: column !important;
         align-items: stretch !important;
         padding: 16px 14px !important;
@@ -2310,7 +2500,7 @@
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
-        gap: 12px !important;
+        gap: 14px !important;
         overflow: hidden !important;
       }
 
@@ -2367,7 +2557,8 @@
         font-size: 13px !important;
         border-radius: 999px !important;
         box-sizing: border-box !important;
-        white-space: nowrap !important;
+        white-space: normal !important;
+        text-align: center !important;
       }
 
       .wallet-highlight-note {
@@ -2383,13 +2574,13 @@
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        margin: 2px auto 0 !important;
+        margin: 4px auto 0 !important;
         cursor: pointer !important;
       }
 
       .mini-pass-preview-mockup {
-        width: 145px !important;
-        height: 100px !important;
+        width: 140px !important;
+        height: 96px !important;
         border-radius: 12px !important;
         padding: 6px 9px !important;
         box-sizing: border-box !important;
@@ -2428,22 +2619,6 @@
       .mini-pass-hover-label {
         font-size: 10px !important;
         margin-top: 3px !important;
-      }
-
-      /* Picture controls & Font chips row on tablet/mobile */
-      .picture-controls-grid {
-        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
-        gap: 10px !important;
-      }
-
-      .font-chips-row {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        scrollbar-width: none !important;
-        gap: 6px !important;
-        padding-bottom: 6px !important;
       }
     }
 
@@ -2954,9 +3129,15 @@
 
       /* Wallet Design Highlight Card Mobile View - Compact & Perfectly Fitted */
       .wallet-design-highlight-card {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
         padding: 14px 12px !important;
         border-radius: 16px !important;
         gap: 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .wallet-highlight-title {
@@ -2969,13 +3150,20 @@
       }
 
       .btn-launch-wallet-design {
+        width: 100% !important;
+        justify-content: center !important;
         padding: 9px 14px !important;
         font-size: 12.5px !important;
+        white-space: normal !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
       }
 
       .mini-pass-preview-mockup {
         width: 130px !important;
         height: 90px !important;
+        padding: 5px 8px !important;
+        box-sizing: border-box !important;
       }
 
       footer .wrap {
@@ -4373,7 +4561,7 @@
 
           <!-- Google Fonts Chooser -->
           <div class="s6" style="margin-top:4px;">
-            <div
+            <div class="typography-header"
               style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
               <span class="lbl" style="margin:0;">Card Typography (Google Fonts)</span>
               <select id="fontSelectDropdown" class="font-select-control" onchange="selectCardFont(this.value)">
@@ -4458,8 +4646,8 @@
 
           <!-- Live Preview Drag & Zoom Picture Controls Readout -->
           <div class="s6">
-            <div style="background:rgba(8,124,255,0.04);border:1px solid rgba(8,124,255,0.18);border-radius:14px;padding:12px 16px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div class="picture-controls-container" style="background:rgba(8,124,255,0.04);border:1px solid rgba(8,124,255,0.18);border-radius:14px;padding:12px 16px;">
+              <div class="picture-controls-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
                 <span style="font-size:13px;font-weight:700;color:var(--ink);"><i class="bi bi-arrows-move" style="color:var(--blue);"></i> Live Drag &amp; Zoom Picture Controls</span>
                 <span style="font-size:11.5px;color:var(--muted);"><i class="bi bi-check-circle-fill" style="color:#10B981;"></i> Auto-saved to card</span>
               </div>
