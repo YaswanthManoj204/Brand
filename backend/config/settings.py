@@ -71,7 +71,7 @@ else:
             if _vercel_host and _vercel_host not in ALLOWED_HOSTS:
                 ALLOWED_HOSTS.append(_vercel_host)
     if not IS_PRODUCTION:
-        for _local_host in ('127.0.0.1', 'localhost', '.localhost', '.nip.io', '.sslip.io'):
+        for _local_host in ('127.0.0.1', 'localhost', '.localhost'):
             if _local_host not in ALLOWED_HOSTS:
                 ALLOWED_HOSTS.append(_local_host)
 

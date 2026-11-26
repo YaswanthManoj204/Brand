@@ -101,12 +101,7 @@ class SubdomainRoutingMiddleware:
             sub = prefix.split('.')[0].strip()
             return sub if sub else None
 
-        # 5. Check wildcard local DNS like nip.io or sslip.io or lvh.me
-        if '.nip.io' in host or '.sslip.io' in host or '.lvh.me' in host:
-            sub = host.split('.')[0].strip()
-            return sub if sub else None
-
-        # 6. Cloud / Serverless platform domains (*.vercel.app, *.onrender.com, *.railway.app)
+        # 5. Cloud / Serverless platform domains (*.vercel.app, *.onrender.com, *.railway.app)
         for platform_suffix in ('.vercel.app', '.onrender.com', '.railway.app', '.appspot.com'):
             if host.endswith(platform_suffix):
                 parts = host.split('.')

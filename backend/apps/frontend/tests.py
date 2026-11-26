@@ -1426,10 +1426,11 @@ class FrontendFlowTests(TestCase):
         self.assertEqual(login_res.status_code, 302)
         self.assertEqual(login_res['Location'], reverse('card_edit', kwargs={'card_id': emp_created_card.card_id}))
 
-        # Employee checks landing page: has 'My Cards' in navbar
+        # Employee checks landing page: has user profile / My Cards link in navbar
         landing_res = self.client.get(reverse('landing'))
         self.assertEqual(landing_res.status_code, 200)
-        self.assertContains(landing_res, 'My Cards')
+        self.assertContains(landing_res, reverse('card_list'))
+        self.assertContains(landing_res, emp_digital.username)
 
         # B. NFC Plan (5 cards + 5 NFC, has_nfc=True)
         ceo_nfc = User.objects.create_user(username='ceo_nfc', email='ceo_nfc@example.com', password='password123')
@@ -1769,7 +1770,7 @@ class FrontendFlowTests(TestCase):
         self.assertIn('Arjun Robotics Labs', admin_email.subject)
         self.assertIn('Obsidian Black', admin_email.body)
         self.assertIn('Gold', admin_email.body)
-        self.assertIn(card.share_url, admin_email.body)
+        self.assertIn(f"http://{card.slug}.localhost", admin_email.body)
 
         # Verify Client received Order Placed confirmation email to their login/signup email
         client_order_emails = [m for m in mail.outbox if 'arjun.innovations@gmail.com' in m.to]
@@ -2538,10 +2539,9 @@ class FrontendFlowTests(TestCase):
             layout_config={'payment_receipt': {'plan': 'Business Card', 'amount': 499}}
         )
 
-        expected_ip = get_lan_ip() or '127.0.0.1'
-        expected_local_url = f"http://raj.{expected_ip}.nip.io:8000/"
+        expected_local_url = "http://raj.localhost:8000/"
 
-        # 1. Verify Local Server URL Generation (Unhosted Mode with nip.io)
+        # 1. Verify Local Server URL Generation (Unhosted Mode with localhost subdomain)
         subdomain_url = get_card_subdomain_url(card.slug)
         self.assertEqual(subdomain_url, expected_local_url)
         self.assertEqual(card.subdomain_url, expected_local_url)
@@ -2549,25 +2549,25 @@ class FrontendFlowTests(TestCase):
 
         req_local = rf.get('/card/raj/', HTTP_HOST='192.168.1.34:8000')
         share_url_local = get_shareable_url(req_local, f'/card/{card.slug}/')
-        self.assertEqual(share_url_local, 'http://raj.192.168.1.34.nip.io:8000/')
+        self.assertEqual(share_url_local, 'http://raj.localhost:8000/')
 
         # 2. Verify Card Preview Page displays the local server link
         self.client.force_login(user)
-        preview_res = self.client.get(reverse('card_preview', kwargs={'card_id': card.card_id}), HTTP_HOST='192.168.1.34:8000')
+        preview_res = self.client.get(reverse('card_preview', kwargs={'card_id': card.card_id}), HTTP_HOST='localhost:8000')
         self.assertEqual(preview_res.status_code, 200)
-        self.assertContains(preview_res, 'http://raj.192.168.1.34.nip.io:8000/')
+        self.assertContains(preview_res, 'http://raj.localhost:8000/')
         self.assertContains(preview_res, 'Shareable Subdomain Link:')
 
-        # 3. Verify Subdomain Routing Middleware on nip.io (http://raj.192.168.1.34.nip.io:8000/)
-        sub_res_nip = self.client.get('/', HTTP_HOST='raj.192.168.1.34.nip.io:8000')
-        self.assertEqual(sub_res_nip.status_code, 200)
-        self.assertContains(sub_res_nip, 'Raj Luxury Studio')
-        self.assertContains(sub_res_nip, 'Raj Malhotra')
+        # 3. Verify Subdomain Routing Middleware on localhost subdomain (http://raj.localhost:8000/)
+        sub_res_local = self.client.get('/', HTTP_HOST='raj.localhost:8000')
+        self.assertEqual(sub_res_local.status_code, 200)
+        self.assertContains(sub_res_local, 'Raj Luxury Studio')
+        self.assertContains(sub_res_local, 'Raj Malhotra')
 
-        # Subdomain direct QR code request on nip.io: http://raj.192.168.1.34.nip.io:8000/qr.png
-        sub_qr_nip = self.client.get('/qr.png', HTTP_HOST='raj.192.168.1.34.nip.io:8000')
-        self.assertEqual(sub_qr_nip.status_code, 200)
-        self.assertEqual(sub_qr_nip['Content-Type'], 'image/png')
+        # Subdomain direct QR code request on localhost: http://raj.localhost:8000/qr.png
+        sub_qr_local = self.client.get('/qr.png', HTTP_HOST='raj.localhost:8000')
+        self.assertEqual(sub_qr_local.status_code, 200)
+        self.assertEqual(sub_qr_local['Content-Type'], 'image/png')
 
         # 4. Verify Production Domain Hosting Mode (e.g. CARD_BASE_DOMAIN='mybrand.com')
         with override_settings(CARD_BASE_DOMAIN='mybrand.com'):

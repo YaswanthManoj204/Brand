@@ -215,12 +215,10 @@ def get_lan_ip():
 def get_card_subdomain_url(card_or_slug, request=None):
     """
     Constructs the official card link:
-    - In production (hosted on a domain like qkbiz.com or custom domain):
-      https://<slug>.<domain>/ (e.g. https://yas.qkbiz.com/)
-    - In local development (unhosted server / local testing):
-      http://<slug>.<lan_ip>.nip.io:<port>/ (e.g. http://yas.192.168.1.34.nip.io:8000/)
-      Using nip.io provides true wildcard subdomain testing on local machines and mobile devices
-      without requiring a purchased domain or DNS configuration.
+    - In production (hosted on a domain like qkbiz.com, brandnest-black.vercel.app, or custom domain):
+      https://<slug>.<domain>/ (e.g. https://yas.qkbiz.com/ or https://yas.brandnest-black.vercel.app/)
+    - In local development:
+      http://<slug>.localhost:<port>/ (e.g. http://yas.localhost:8000/)
     """
     from django.conf import settings
     slug = card_or_slug.slug if hasattr(card_or_slug, 'slug') else str(card_or_slug)
@@ -246,12 +244,12 @@ def get_card_subdomain_url(card_or_slug, request=None):
     if base_domain:
         return f"https://{slug}.{base_domain}/"
 
-    # Otherwise, unhosted local testing using wildcard DNS (nip.io)
-    server_ip = get_lan_ip() or '127.0.0.1'
     port_str = ":8000"
+    scheme = "http"
 
     if request:
         try:
+            scheme = "https" if request.is_secure() else "http"
             host_header = request.get_host().strip().lower()
             if ':' in host_header:
                 parts = host_header.split(':')
@@ -262,25 +260,28 @@ def get_card_subdomain_url(card_or_slug, request=None):
                 raw_host = host_header
                 port_str = ""
 
-            if raw_host in ('0.0.0.0', '127.0.0.1', 'localhost', 'testserver') or raw_host.startswith('0.0.0.0'):
-                server_ip = get_lan_ip() or '127.0.0.1'
-                if not port_str:
-                    port_str = ":8000"
+            # Check for cloud / serverless platform domains (*.vercel.app, *.onrender.com, etc.)
+            for platform_suffix in ('.vercel.app', '.onrender.com', '.railway.app', '.appspot.com'):
+                if raw_host.endswith(platform_suffix):
+                    parts = raw_host.split('.')
+                    if len(parts) >= 4:
+                        clean_platform = '.'.join(parts[1:])
+                    else:
+                        clean_platform = raw_host
+                    return f"https://{slug}.{clean_platform}{port_str}/"
+
+            if raw_host in ('0.0.0.0', '127.0.0.1', 'localhost', 'testserver') or raw_host.endswith('.localhost'):
+                return f"http://{slug}.localhost{port_str}/"
             elif re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', raw_host):
-                if not raw_host.startswith(('0.', '127.')):
-                    server_ip = raw_host
-            elif '.nip.io' in raw_host or '.sslip.io' in raw_host:
-                ip_match = re.search(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\.(nip|sslip)\.io', raw_host)
-                if ip_match:
-                    server_ip = ip_match.group(1)
+                return f"http://{slug}.localhost{port_str}/"
             elif '.' in raw_host and not raw_host.replace('.', '').isdigit():
                 domain_parts = raw_host.split('.')
                 clean_domain = '.'.join(domain_parts[1:]) if len(domain_parts) >= 3 else raw_host
-                return f"https://{slug}.{clean_domain}{port_str}/"
+                return f"{scheme}://{slug}.{clean_domain}{port_str}/"
         except Exception:
             pass
 
-    return f"http://{slug}.{server_ip}.nip.io{port_str}/"
+    return f"http://{slug}.localhost{port_str}/"
 
 
 def get_qr_target_url(card_or_slug, request=None):
