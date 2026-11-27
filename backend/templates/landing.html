@@ -208,11 +208,13 @@
       right: 20px;
       max-width: 860px;
       margin: 0 auto;
-      background: #F4F1EA;
-      border: 1px solid rgba(0, 0, 0, 0.07);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--line);
       border-radius: 26px;
       padding: 26px 28px;
-      box-shadow: 0 24px 60px -10px rgba(22, 23, 26, 0.16), 0 0 1px rgba(0,0,0,0.06);
+      box-shadow: 0 24px 60px -10px rgba(22, 23, 26, 0.12), 0 0 1px rgba(0,0,0,0.06);
       display: grid;
       grid-template-columns: 200px 1fr 1fr;
       gap: 22px;
@@ -273,13 +275,13 @@
     }
 
     .mega-link:hover {
-      background: rgba(0, 0, 0, 0.05);
+      background: #F1F5F9;
       color: #000;
       transform: translateX(3px);
     }
 
     .mega-card-item {
-      background: #ECE7DE;
+      background: #F8FAFC;
       border-radius: 20px;
       overflow: hidden;
       display: flex;
@@ -287,15 +289,16 @@
       justify-content: space-between;
       text-decoration: none;
       color: inherit;
-      transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease;
+      transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease, border-color 0.24s ease;
       cursor: pointer;
       position: relative;
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      border: 1px solid #E2E8F0;
     }
 
     .mega-card-item:hover {
       transform: translateY(-4px);
-      box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.08);
+      border-color: #CBD5E1;
     }
 
     .mega-card-art {
@@ -306,6 +309,7 @@
       justify-content: center;
       overflow: hidden;
       padding: 10px;
+      background: #F8FAFC;
     }
 
     .mega-card-bottom {
@@ -313,8 +317,8 @@
       align-items: center;
       justify-content: space-between;
       padding: 16px 20px;
-      background: #ECE7DE;
-      border-top: 1px solid rgba(0, 0, 0, 0.03);
+      background: #F1F5F9;
+      border-top: 1px solid #E2E8F0;
     }
 
     .mega-card-name {
