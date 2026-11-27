@@ -93,6 +93,7 @@ a { color: inherit; text-decoration: none; }
   color: #fff;
   transition: all 0.2s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
 }
 .pill:hover { background: #34363c; transform: translateY(-1px); }
 .pill.light { background: #fff; color: var(--ink); border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
@@ -493,11 +494,57 @@ footer {
   z-index: 1;
 }
 
+.nav-auth-pill {
+  white-space: nowrap !important;
+  text-decoration: none;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.2;
+}
+.nav-auth-lead {
+  color: #55565B;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.nav-auth-action {
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
 @media (max-width: 980px) {
   .nav ul { display: none; }
   .auth-grid { grid-template-columns: 1fr; gap: 36px; }
   .auth-showcase { display: none; }
   .auth-card { padding: 32px 24px; }
+}
+@media (max-width: 680px) {
+  .top {
+    top: 10px;
+    padding: 0 12px;
+  }
+  .nav {
+    padding: 6px 8px 6px 14px;
+  }
+  .logo {
+    font-size: 17px;
+    gap: 8px;
+  }
+  .mark {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+  }
+  .nav-auth-lead {
+    display: none !important;
+  }
+  .pill.sm.nav-auth-pill {
+    padding: 7px 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
 }
 @media (max-width: 540px) {
   .social-auth-grid { grid-template-columns: 1fr; }
@@ -517,7 +564,7 @@ footer {
       <li><a href="{% url 'card_builder' %}">Business Card</a></li>
       <li><a href="{% url 'card_choose_plan' %}">NFC Cards</a></li>
     </ul>
-    <a class="pill sm light" href="{% url 'signup' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Don't have an account? <b>Sign Up</b></a>
+    <a class="pill sm light nav-auth-pill" href="{% url 'signup' %}{% if next %}?next={{ next|urlencode }}{% endif %}"><span class="nav-auth-lead">Don't have an account?</span> <b class="nav-auth-action">Sign Up</b></a>
   </nav>
 </div>
 
