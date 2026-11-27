@@ -1,0 +1,27 @@
+name: Deploy Django to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH into EC2 and restart Django server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/Brand
+            git pull origin main
+            source ~/Brand/venv/bin/activate
+            cd ~/Brand/backend
+            if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+            python manage.py migrate
+            tmux kill-session -t django || true
+            tmux new-session -d -s django "source ~/Brand/venv/bin/activate && cd ~/Brand/backend && python manage.py runserver 0.0.0.0:8000"
