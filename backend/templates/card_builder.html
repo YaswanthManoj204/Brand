@@ -5092,7 +5092,125 @@
           </div>
         </div>
       </div>
-    </aside>
+
+      {% if card.layout_config.nfc_card and card.layout_config.nfc_card.ordered %}
+      <!-- Physical Smart NFC Card Preview Section (Shown Below Phone Preview) -->
+      <div class="nfc-builder-aside-preview card shadow-sm text-white" id="asideNfcPreviewContainer" style="margin-top: 18px; background: linear-gradient(145deg, #0F172A 0%, #1E293B 100%); border: 1px solid rgba(56,189,248,0.35) !important; border-radius: 24px; padding: 18px; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);">
+          <div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span style="font-size:10.5px;font-weight:700;background:rgba(56,189,248,0.15);color:#38BDF8;border:1px solid rgba(56,189,248,0.3);padding:2px 8px;border-radius:999px;">
+                <i class="bi bi-broadcast"></i> NFC Hardware
+              </span>
+              <span style="font-size:10.5px;font-weight:700;background:rgba(34,197,94,0.15);color:#4ADE80;border:1px solid rgba(34,197,94,0.3);padding:2px 8px;border-radius:999px;">
+                Paid ₹999
+              </span>
+            </div>
+            <h4 style="margin:0;font-size:13.5px;font-weight:700;color:#FFFFFF;">Your Custom Smart NFC Physical Card</h4>
+          </div>
+          <button type="button" class="btn-flip-nfc" onclick="document.getElementById('asideNfcCardInner').classList.toggle('is-flipped')" style="background:rgba(56,189,248,0.1);color:#38BDF8;border:1px solid rgba(56,189,248,0.3);border-radius:999px;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Flip between front and back">
+            <i class="bi bi-arrow-repeat"></i> Flip NFC Card
+          </button>
+        </div>
+
+        <!-- 3D Card Display -->
+        <div style="display:flex;justify-content:center;margin:10px 0;">
+          <div class="nfc-preview-flip-wrap" style="width:100%;max-width:320px;aspect-ratio:1.586/1;perspective:1000px;">
+            <div id="asideNfcCardInner" class="nfc-flip-inner theme-{{ card.layout_config.nfc_card.theme|default:'obsidian_black' }} foil-{{ card.layout_config.nfc_card.foil|default:'gold' }}" style="position:relative;width:100%;height:100%;transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);transform-style:preserve-3d;cursor:pointer;" onclick="this.classList.toggle('is-flipped')" title="Click card to flip front & back">
+              <!-- Front Face -->
+              <div class="nfc-card-face nfc-card-front" style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 14px 30px rgba(0,0,0,0.5);">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div class="nfc-chip-chip" style="width:34px;height:26px;border-radius:4px;background:linear-gradient(135deg, #d4af37, #aa771c);border:1px solid rgba(255,255,255,0.4);position:relative;">
+                    <div style="position:absolute;inset:2px;border:1px dashed rgba(0,0,0,0.3);border-radius:2px;"></div>
+                  </div>
+                  <div class="nfc-wave-icon" style="font-size:18px;opacity:0.9;">
+                    <i class="bi bi-broadcast"></i>
+                  </div>
+                </div>
+                <div class="preview-nfc-elem" data-key="front_name_role">
+                  <div class="nfc-holder-name" style="font-size:15px;font-weight:800;letter-spacing:0.02em;margin-bottom:1px;line-height:1.2;">
+                    {{ card.layout_config.nfc_card.name|default:card.owner_name|default:"Cardholder Name" }}
+                  </div>
+                  <div class="nfc-holder-role" style="font-size:9.5px;font-weight:700;letter-spacing:0.08em;opacity:0.85;text-transform:uppercase;">
+                    {{ card.layout_config.nfc_card.designation|default:card.tagline|default:"Designation" }}
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:8.5px;letter-spacing:0.06em;opacity:0.65;">
+                  <span class="preview-nfc-elem" data-key="front_pass">{{ card.layout_config.nfc_card.pass_tagline|default:"BrandNest Smart Pass" }}</span>
+                  <span class="preview-nfc-elem" data-key="front_chip_spec">{{ card.layout_config.nfc_card.chip_spec|default:"NTAG216 · 888 BYTES" }}</span>
+                </div>
+              </div>
+
+              <!-- Back Face -->
+              <div class="nfc-card-face nfc-card-back" style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 14px 30px rgba(0,0,0,0.5);transform:rotateY(180deg);">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="preview-nfc-elem" data-key="back_tagline" style="font-size:8.5px;font-weight:700;letter-spacing:0.06em;opacity:0.65;">{{ card.layout_config.nfc_card.back_tagline|default:"SMART CONTACTLESS TOUCHPOINT" }}</span>
+                  <i class="bi bi-wifi" style="font-size:15px;opacity:0.85;"></i>
+                </div>
+                <div style="text-align:center;margin:auto 0;padding:2px 0;">
+                  <div class="preview-nfc-elem" data-key="back_logo" style="display:inline-block;">
+                    {% if card.layout_config.nfc_card.logo_data == 'none' %}
+                    {# Logo hidden by user #}
+                    {% elif card.layout_config.nfc_card.logo_data %}
+                    <img src="{{ card.layout_config.nfc_card.logo_data }}" alt="Logo" style="max-height:34px;max-width:110px;object-fit:contain;margin-bottom:3px;transform:scale({{ card.layout_config.nfc_card.logo_scale|default:'1.0' }});filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+                    {% elif card.logo %}
+                    <img src="{{ card.logo.url }}" alt="Logo" style="max-height:34px;max-width:110px;object-fit:contain;margin-bottom:3px;transform:scale({{ card.layout_config.nfc_card.logo_scale|default:'1.0' }});filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+                    {% else %}
+                    <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.18);display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;margin-bottom:3px;">{{ card.business_name|slice:":1"|upper }}</div>
+                    {% endif %}
+                  </div>
+                  <div class="preview-nfc-elem" data-key="back_biz" style="font-size:13px;font-weight:800;letter-spacing:-0.02em;">{{ card.layout_config.nfc_card.company_name|default:card.business_name }}</div>
+                  <div class="preview-nfc-elem" data-key="back_hint" style="font-size:9.5px;opacity:0.75;margin-top:2px;">{{ card.layout_config.nfc_card.tap_hint|default:"Tap against any smartphone to open card" }}</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:8px;opacity:0.6;">
+                  <span class="preview-nfc-elem" data-key="back_website">{{ card.layout_config.nfc_card.website|default:card.existing_website|default:"www.brandnest.in" }}</span>
+                  <span class="preview-nfc-elem" data-key="back_badge">{{ card.layout_config.nfc_card.back_badge|default:"Direct NFC Tap" }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center;color:rgba(255,255,255,0.6);font-size:11px;margin:3px 0 6px;">
+          <i class="bi bi-cursor-fill" style="color:#38BDF8;margin-right:4px;"></i> Click card or button above to flip front &amp; back
+        </div>
+
+        <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;font-size:11.5px;">
+          <span style="color:rgba(255,255,255,0.5);">Physical Finish:</span>
+          <span style="color:#FFFFFF;font-weight:600;text-transform:capitalize;">{{ card.layout_config.nfc_card.theme|default:"Obsidian Black"|cut:"_" }} ({{ card.layout_config.nfc_card.foil|default:"Gold"|title }} Foil)</span>
+        </div>
+
+        <div style="margin-top:4px;display:flex;justify-content:space-between;align-items:center;font-size:11.5px;">
+          <span style="color:rgba(255,255,255,0.5);">Status:</span>
+          {% with nfc_status=card.layout_config.nfc_card.status|default:"Order Placed" %}
+          {% if nfc_status == 'Shipped' %}
+              <span style="color:#FBBF24;font-weight:600;"><i class="bi bi-truck me-1"></i> Shipped</span>
+          {% elif nfc_status == 'Delivered' %}
+              <span style="color:#4ADE80;font-weight:600;"><i class="bi bi-check2-circle me-1"></i> Delivered</span>
+          {% elif nfc_status == 'Printing & Engraving' or nfc_status == 'Printing' %}
+              <span style="color:#38BDF8;font-weight:600;"><i class="bi bi-gear-wide-connected me-1"></i> Printing &amp; Engraving</span>
+          {% elif nfc_status == 'Order Placed' %}
+              <span style="color:#38BDF8;font-weight:600;"><i class="bi bi-clock-history me-1"></i> Order Placed</span>
+          {% else %}
+              <span style="color:#4ADE80;font-weight:600;"><i class="bi bi-check-circle-fill me-1"></i> {{ nfc_status }}</span>
+          {% endif %}
+          {% endwith %}
+        </div>
+
+        {% if card.layout_config.nfc_card.tracking_info %}
+        <div style="margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;font-size:11px;">
+          <span style="color:rgba(255,255,255,0.5);"><i class="bi bi-geo-alt" style="color:#FBBF24;margin-right:4px;"></i>Tracking:</span>
+          <span style="color:#38BDF8;font-weight:600;">{{ card.layout_config.nfc_card.tracking_info }}</span>
+        </div>
+        {% endif %}
+
+        <div style="margin-top:10px;text-align:center;">
+          <button type="button" onclick="window.openNfcStudioModal(event)" style="background:rgba(255,255,255,0.08);color:#FFFFFF;border:1px solid rgba(255,255,255,0.15);border-radius:999px;font-size:11.5px;font-weight:700;padding:6px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+            <i class="bi bi-sliders text-info"></i> Edit NFC Artwork &amp; Placement &rarr;
+          </button>
+        </div>
+      </div>
+      {% endif %}
   </main>
 
   <!-- Wallet Design Studio (Accessible in the same browser window/tab!) -->
@@ -9229,6 +9347,30 @@
       if (typeof window.checkAboutTextClamp === 'function') {
         window.checkAboutTextClamp();
       }
+
+      (function applySavedAsideNfcPositions() {
+        try {
+          const rawPos = '{{ card.layout_config.nfc_card.positions|default:"{}"|escapejs }}';
+          if (!rawPos) return;
+          const positions = JSON.parse(rawPos);
+          if (typeof positions !== 'object') return;
+          Object.entries(positions).forEach(([key, pos]) => {
+            if (!pos) return;
+            const el = document.querySelector(`.nfc-builder-aside-preview .preview-nfc-elem[data-key="${key}"]`);
+            if (el) {
+              const scaleFactor = 0.84;
+              const x = Math.round((pos.x || 0) * scaleFactor);
+              const y = Math.round((pos.y || 0) * scaleFactor);
+              if (key === 'back_logo') {
+                const logoScale = '{{ card.layout_config.nfc_card.logo_scale|default:"1.0" }}';
+                el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${logoScale})`;
+              } else {
+                el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+              }
+            }
+          });
+        } catch(e) {}
+      })();
 
       document.addEventListener('click', function(e) {
         const a = e.target.closest('a');
