@@ -59,21 +59,28 @@ if not SECRET_KEY:
 CARD_BASE_DOMAIN = os.environ.get('CARD_BASE_DOMAIN', '').strip()
 
 _env_hosts = _csv_env('ALLOWED_HOSTS')
-if not IS_PRODUCTION and DEBUG and not _env_hosts:
+if not _env_hosts:
+    # Default to all hosts so AWS EC2 public IPs, AWS hostnames, and custom domains work out-of-the-box
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = list(_env_hosts)
-    if IS_VERCEL or IS_PRODUCTION:
-        if '.vercel.app' not in ALLOWED_HOSTS:
-            ALLOWED_HOSTS.append('.vercel.app')
-        for _vercel_host_var in ('VERCEL_URL', 'VERCEL_BRANCH_URL', 'VERCEL_PROJECT_PRODUCTION_URL'):
-            _vercel_host = os.environ.get(_vercel_host_var, '').strip()
-            if _vercel_host and _vercel_host not in ALLOWED_HOSTS:
-                ALLOWED_HOSTS.append(_vercel_host)
-    if not IS_PRODUCTION:
-        for _local_host in ('127.0.0.1', 'localhost', '.localhost'):
-            if _local_host not in ALLOWED_HOSTS:
-                ALLOWED_HOSTS.append(_local_host)
+    # Ensure AWS EC2 hostnames, Elastic Beanstalk, ELB, Vercel, and localhost are allowed
+    for _auto_host in (
+        '.amazonaws.com',
+        '.elasticbeanstalk.com',
+        '.elb.amazonaws.com',
+        '.cloudfront.net',
+        '.vercel.app',
+        '127.0.0.1',
+        'localhost',
+        '.localhost'
+    ):
+        if _auto_host not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(_auto_host)
+    for _vercel_host_var in ('VERCEL_URL', 'VERCEL_BRANCH_URL', 'VERCEL_PROJECT_PRODUCTION_URL'):
+        _vercel_host = os.environ.get(_vercel_host_var, '').strip()
+        if _vercel_host and _vercel_host not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(_vercel_host)
 
 # Ensure base domain and all wildcard subdomains (*.qkbiz.com) are allowed
 if CARD_BASE_DOMAIN:
@@ -85,6 +92,16 @@ if CARD_BASE_DOMAIN:
         ALLOWED_HOSTS.append(_bare_domain)
 
 CSRF_TRUSTED_ORIGINS = _csv_env('CSRF_TRUSTED_ORIGINS')
+
+# Always trust AWS EC2, Elastic Beanstalk, and Vercel domains for CSRF
+for _cloud_csrf in (
+    'http://*.amazonaws.com', 'https://*.amazonaws.com',
+    'http://*.elasticbeanstalk.com', 'https://*.elasticbeanstalk.com',
+    'https://*.vercel.app'
+):
+    if _cloud_csrf not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(_cloud_csrf)
+
 if CARD_BASE_DOMAIN:
     _bare_domain = CARD_BASE_DOMAIN.lstrip('.')
     for _scheme in ('https', 'http'):
@@ -95,19 +112,11 @@ if CARD_BASE_DOMAIN:
         if _origin_bare not in CSRF_TRUSTED_ORIGINS:
             CSRF_TRUSTED_ORIGINS.append(_origin_bare)
 
-if IS_VERCEL or IS_PRODUCTION:
-    if 'https://*.vercel.app' not in CSRF_TRUSTED_ORIGINS:
-        CSRF_TRUSTED_ORIGINS.append('https://*.vercel.app')
-    for _vercel_host_var in ('VERCEL_URL', 'VERCEL_BRANCH_URL', 'VERCEL_PROJECT_PRODUCTION_URL'):
-        _vercel_host = os.environ.get(_vercel_host_var, '').strip()
-        if _vercel_host:
-            _origin = f'https://{_vercel_host}'
-            if _origin not in CSRF_TRUSTED_ORIGINS:
-                CSRF_TRUSTED_ORIGINS.append(_origin)
-    for _host in ALLOWED_HOSTS:
-        _clean_host = _host.lstrip('.')
-        if _clean_host and _clean_host not in ('*', '127.0.0.1', 'localhost', '0.0.0.0'):
-            _origin = f'https://*.{_clean_host}' if _host.startswith('.') else f'https://{_host}'
+for _host in ALLOWED_HOSTS:
+    _clean_host = _host.lstrip('.')
+    if _clean_host and _clean_host not in ('*', '127.0.0.1', 'localhost', '0.0.0.0'):
+        for _scheme in ('https', 'http'):
+            _origin = f'{_scheme}://*.{_clean_host}' if _host.startswith('.') else f'{_scheme}://{_host}'
             if _origin not in CSRF_TRUSTED_ORIGINS:
                 CSRF_TRUSTED_ORIGINS.append(_origin)
 

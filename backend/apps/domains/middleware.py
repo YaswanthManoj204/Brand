@@ -79,11 +79,16 @@ class SubdomainRoutingMiddleware:
         """
         host = host.split(':')[0].strip().lower()
 
-        # 1. Pure IP address (e.g. 192.168.1.34 or 127.0.0.1) -> No subdomain
+        # 1. Pure IP address (e.g. 54.210.12.34, 192.168.1.34 or 127.0.0.1) -> No subdomain
         if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', host):
             return None
 
-        # 2. Subdomain on local server IP (e.g. medowa-global-4.192.168.1.34 or raj.192.168.1.34)
+        # 2. AWS platform hostnames (e.g. ec2-xx-xx.compute-1.amazonaws.com, *.elasticbeanstalk.com) -> No subdomain
+        for aws_suffix in ('.amazonaws.com', '.elasticbeanstalk.com', '.elb.amazonaws.com', '.cloudfront.net', '.aws'):
+            if host.endswith(aws_suffix):
+                return None
+
+        # 3. Subdomain on local server IP (e.g. medowa-global-4.192.168.1.34 or raj.192.168.1.34)
         ip_sub_match = re.match(r'^([a-zA-Z0-9_\-]+)\.\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', host)
         if ip_sub_match:
             return ip_sub_match.group(1).lower()

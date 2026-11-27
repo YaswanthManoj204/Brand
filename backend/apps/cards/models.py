@@ -164,10 +164,16 @@ class BusinessCard(models.Model):
 
     @property
     def share_url(self):
+        if hasattr(self, '_share_url_override') and self._share_url_override:
+            return self._share_url_override
         from apps.frontend.views import get_card_subdomain_url
         if self.domain and self.domain.domain_type == 'custom':
             return f"https://{self.domain.domain_name}/"
         return get_card_subdomain_url(self.slug)
+
+    @share_url.setter
+    def share_url(self, value):
+        self._share_url_override = value
 
     @property
     def subdomain_url(self):

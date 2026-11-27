@@ -212,13 +212,32 @@ def get_lan_ip():
     return None
 
 
+AWS_AND_CLOUD_SUFFIXES = (
+    '.amazonaws.com',
+    '.elasticbeanstalk.com',
+    '.elb.amazonaws.com',
+    '.cloudfront.net',
+    '.aws',
+    '.vercel.app',
+    '.onrender.com',
+    '.railway.app',
+    '.herokuapp.com',
+    '.appspot.com',
+    '.fly.dev',
+    '.ngrok-free.app',
+    '.ngrok.io',
+)
+
+
 def get_card_subdomain_url(card_or_slug, request=None):
     """
     Constructs the official card link:
-    - In production (hosted on a domain like qkbiz.com, brandnest-black.vercel.app, or custom domain):
-      https://<slug>.<domain>/ (e.g. https://yas.qkbiz.com/ or https://yas.brandnest-black.vercel.app/)
-    - In local development:
-      http://<slug>.localhost:<port>/ (e.g. http://yas.localhost:8000/)
+    - If custom verified domain on card: https://<custom_domain>/
+    - If CARD_BASE_DOMAIN is set and not a cloud/IP suffix: https://<slug>.<base_domain>/
+    - On AWS (EC2, Elastic Beanstalk, ELB) or Cloud PaaS (Vercel, Render) or public IP:
+      http(s)://<host>/card/<slug>/ (direct, 100% reachable path worldwide)
+    - In local development on 127.0.0.1 / localhost:
+      http://<slug>.localhost:<port>/
     """
     from django.conf import settings
     slug = card_or_slug.slug if hasattr(card_or_slug, 'slug') else str(card_or_slug)
@@ -236,16 +255,17 @@ def get_card_subdomain_url(card_or_slug, request=None):
         if cs and cs.website:
             clean_w = cs.website.replace('http://', '').replace('https://', '').strip('/').split(':')[0].lower()
             if clean_w and '.' in clean_w and not clean_w.startswith(('127.', '192.', '10.', 'localhost')) and not clean_w.replace('.', '').isdigit():
-                base_domain = clean_w
+                if not any(clean_w.endswith(sfx) for sfx in AWS_AND_CLOUD_SUFFIXES):
+                    base_domain = clean_w
     except Exception:
         pass
 
-    # If hosted on a production domain, return https://<slug>.<domain>/
-    if base_domain:
+    # If a real custom domain is configured (not cloud platform suffix, not localhost, not IP):
+    if base_domain and not any(base_domain.endswith(sfx) for sfx in AWS_AND_CLOUD_SUFFIXES) and not base_domain.endswith('localhost') and not base_domain.startswith(('127.', '192.', '10.')) and not base_domain.replace('.', '').isdigit():
         return f"https://{slug}.{base_domain}/"
 
-    port_str = ":8000"
     scheme = "http"
+    port_str = ":8000"
 
     if request:
         try:
@@ -260,25 +280,31 @@ def get_card_subdomain_url(card_or_slug, request=None):
                 raw_host = host_header
                 port_str = ""
 
-            # Check for cloud / serverless platform domains (*.vercel.app, *.onrender.com, etc.)
-            # These platforms do NOT support wildcard subdomains on their shared base domain.
-            # Direct path https://<project>.vercel.app/card/<slug>/ is 100% functional and reachable worldwide.
-            for platform_suffix in ('.vercel.app', '.onrender.com', '.railway.app', '.appspot.com'):
-                if raw_host.endswith(platform_suffix):
-                    return f"https://{raw_host}/card/{slug}/"
+            # 1. AWS & Cloud / PaaS domains: always use direct /card/<slug>/ path!
+            for sfx in AWS_AND_CLOUD_SUFFIXES:
+                if raw_host.endswith(sfx):
+                    return f"{scheme}://{host_header}/card/{slug}/"
 
-            if raw_host in ('0.0.0.0', '127.0.0.1', 'localhost', 'testserver') or raw_host.endswith('.localhost'):
+            # 2. IP addresses (AWS EC2 public IP, LAN IP, etc.):
+            # Subdomains DO NOT work on IP addresses! Always use direct /card/<slug>/ path!
+            if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', raw_host):
+                if raw_host in ('127.0.0.1', '0.0.0.0'):
+                    return f"http://{slug}.localhost{port_str}/"
+                return f"{scheme}://{host_header}/card/{slug}/"
+
+            # 3. Localhost desktop dev
+            if raw_host in ('localhost', 'testserver') or raw_host.endswith('.localhost'):
                 return f"http://{slug}.localhost{port_str}/"
-            elif re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', raw_host):
-                return f"http://{slug}.localhost{port_str}/"
-            elif '.' in raw_host and not raw_host.replace('.', '').isdigit():
-                domain_parts = raw_host.split('.')
-                clean_domain = '.'.join(domain_parts[1:]) if len(domain_parts) >= 3 else raw_host
-                return f"{scheme}://{slug}.{clean_domain}{port_str}/"
+
+            # 4. Custom domain where request matches
+            if '.' in raw_host and not raw_host.replace('.', '').isdigit():
+                if base_domain:
+                    return f"{scheme}://{slug}.{base_domain}{port_str}/"
+                return f"{scheme}://{host_header}/card/{slug}/"
         except Exception:
             pass
 
-    return f"http://{slug}.localhost{port_str}/"
+    return f"http://{slug}.localhost:8000/"
 
 
 def get_qr_target_url(card_or_slug, request=None):
@@ -287,11 +313,11 @@ def get_qr_target_url(card_or_slug, request=None):
     Guaranteed to be reachable when scanned from a physical smartphone camera:
     1. If a custom production domain is configured (CARD_BASE_DOMAIN or card.domain):
        https://<slug>.<domain>/
-    2. If hosted on a cloud platform (e.g. brandnest-black.vercel.app):
-       https://brandnest-black.vercel.app/card/<slug>/
-    3. In local development:
-       Uses computer LAN IP (http://<lan_ip>:<port>/card/<slug>/) so phones
-       on the same Wi-Fi network can connect directly without DNS failures.
+    2. If hosted on AWS (EC2, Elastic Beanstalk, ELB) or Cloud (Vercel, Render) or public IP:
+       http(s)://<host>/card/<slug>/ (reachable from any mobile phone worldwide over Internet)
+    3. In local development on 127.0.0.1 / localhost:
+       Uses computer's Wi-Fi LAN IP (http://<lan_ip>:<port>/card/<slug>/) so phones
+       on the same Wi-Fi network can connect directly.
     """
     slug = card_or_slug.slug if hasattr(card_or_slug, 'slug') else str(card_or_slug)
     slug = slug.strip('/').lower()
@@ -308,16 +334,16 @@ def get_qr_target_url(card_or_slug, request=None):
         if cs and cs.website:
             clean_w = cs.website.replace('http://', '').replace('https://', '').strip('/').split(':')[0].lower()
             if clean_w and '.' in clean_w and not clean_w.startswith(('127.', '192.', '10.', 'localhost')) and not clean_w.replace('.', '').isdigit():
-                base_domain = clean_w
+                if not any(clean_w.endswith(sfx) for sfx in AWS_AND_CLOUD_SUFFIXES):
+                    base_domain = clean_w
     except Exception:
         pass
 
-    if base_domain and not base_domain.endswith(('.vercel.app', '.onrender.com', '.railway.app', '.appspot.com', 'localhost')) and not base_domain.startswith(('127.', '192.', '10.')):
+    if base_domain and not any(base_domain.endswith(sfx) for sfx in AWS_AND_CLOUD_SUFFIXES) and not base_domain.endswith('localhost') and not base_domain.startswith(('127.', '192.', '10.')) and not base_domain.replace('.', '').isdigit():
         return f"https://{slug}.{base_domain}/"
 
+    scheme = "http"
     port_str = ""
-    scheme = "https"
-    raw_host = ""
 
     if request:
         try:
@@ -332,26 +358,41 @@ def get_qr_target_url(card_or_slug, request=None):
                 raw_host = host_header
                 port_str = ""
 
-            for platform_suffix in ('.vercel.app', '.onrender.com', '.railway.app', '.appspot.com'):
-                if raw_host.endswith(platform_suffix):
-                    return f"https://{raw_host}/card/{slug}/"
+            # 1. AWS & Cloud / PaaS domains: always use direct /card/<slug>/ path!
+            for sfx in AWS_AND_CLOUD_SUFFIXES:
+                if raw_host.endswith(sfx):
+                    return f"{scheme}://{host_header}/card/{slug}/"
 
-            if raw_host in ('0.0.0.0', '127.0.0.1', 'localhost', 'testserver') or raw_host.endswith('.localhost') or re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', raw_host):
+            # 2. Public IP addresses (e.g. AWS EC2 public IP 54.x.x.x, 3.x.x.x, LAN IP):
+            if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', raw_host):
+                # Only if strictly loopback 127.0.0.1 on local machine:
+                if raw_host in ('127.0.0.1', '0.0.0.0'):
+                    lan_ip = get_lan_ip()
+                    port = port_str if port_str else ":8000"
+                    if lan_ip and not lan_ip.startswith(('172.', '10.')):
+                        return f"http://{lan_ip}{port}/card/{slug}/"
+                    return f"http://{slug}.localhost{port}/"
+                # For all other IPs (public IP, AWS IP, LAN IP), use host_header directly:
+                return f"{scheme}://{host_header}/card/{slug}/"
+
+            # 3. Localhost on dev machine
+            if raw_host in ('localhost', 'testserver') or raw_host.endswith('.localhost'):
                 lan_ip = get_lan_ip()
                 port = port_str if port_str else ":8000"
-                if lan_ip:
+                if lan_ip and not lan_ip.startswith(('172.', '10.')):
                     return f"http://{lan_ip}{port}/card/{slug}/"
                 return f"http://{slug}.localhost{port}/"
 
+            # 4. Custom domain
             if '.' in raw_host and not raw_host.replace('.', '').isdigit():
-                domain_parts = raw_host.split('.')
-                clean_domain = '.'.join(domain_parts[1:]) if len(domain_parts) >= 3 else raw_host
-                return f"{scheme}://{slug}.{clean_domain}{port_str}/"
+                if base_domain:
+                    return f"{scheme}://{slug}.{base_domain}{port_str}/"
+                return f"{scheme}://{host_header}/card/{slug}/"
         except Exception:
             pass
 
     lan_ip = get_lan_ip()
-    if lan_ip:
+    if lan_ip and not lan_ip.startswith(('172.', '10.')):
         return f"http://{lan_ip}:8000/card/{slug}/"
 
     return f"http://{slug}.localhost:8000/"
@@ -380,7 +421,7 @@ def get_shareable_url(request, path, card=None):
     host = request.get_host()
     if '127.0.0.1' in host or 'localhost' in host or '0.0.0.0' in host:
         lan_ip = get_lan_ip()
-        if lan_ip:
+        if lan_ip and not lan_ip.startswith(('172.', '10.')):
             port = host.split(':')[1] if ':' in host else '8000'
             return f"http://{lan_ip}:{port}{path}"
     return request.build_absolute_uri(path)
@@ -1995,8 +2036,15 @@ def card_list(request):
     else:
         cards = BusinessCard.objects.all().order_by('-created_at')
 
-    total_views = sum(c.views_count for c in cards) if cards else 0
-    published_count = sum(1 for c in cards if c.is_published) if cards else 0
+    cards_list = list(cards)
+    for c in cards_list:
+        try:
+            c.share_url = get_shareable_url(request, reverse('card_standalone', kwargs={'slug': c.slug}))
+        except Exception:
+            c.share_url = c.subdomain_url
+
+    total_views = sum(c.views_count for c in cards_list) if cards_list else 0
+    published_count = sum(1 for c in cards_list if c.is_published) if cards_list else 0
     show_upgrade_modal = (
         request.GET.get('upgrade') == '1'
         and enterprise_quota['is_enterprise']
@@ -2005,10 +2053,10 @@ def card_list(request):
     just_added = request.session.pop('just_added_employee', None)
 
     return render(request, 'card_list.html', {
-        'cards': cards,
+        'cards': cards_list,
         'employees': employees,
         'employees_count': len(employees),
-        'total_count': cards.count() if hasattr(cards, 'count') else len(cards),
+        'total_count': len(cards_list),
         'total_views': total_views,
         'published_count': published_count,
         'enterprise_quota': enterprise_quota,
@@ -2030,6 +2078,7 @@ def card_preview(request, card_id):
     share_url = get_shareable_url(request, standalone_path)
     qr_target_url = get_qr_target_url(card, request=request)
     qr_data_uri = generate_qr_code_base64(qr_target_url)
+    card_subdomain_url = get_card_subdomain_url(card, request=request)
     
     yt_url = (card.layout_config or {}).get('youtube_video_url') or (card.social_links or {}).get('youtube_video') or ''
     card_yt_video_id = _extract_youtube_id(yt_url)
@@ -2038,6 +2087,7 @@ def card_preview(request, card_id):
         'card': card,
         'share_url': share_url,
         'qr_target_url': qr_target_url,
+        'card_subdomain_url': card_subdomain_url,
         'qr_data_uri': qr_data_uri,
         'timestamp': int(time.time()),
         'card_yt_video_id': card_yt_video_id,

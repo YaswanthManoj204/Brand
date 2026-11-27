@@ -2526,7 +2526,7 @@ class FrontendFlowTests(TestCase):
         4. System reserved subdomains (e.g. www) pass through to the main application.
         5. Unknown subdomains render a clean 404 page.
         """
-        from apps.frontend.views import get_card_subdomain_url, get_shareable_url, get_lan_ip
+        from apps.frontend.views import get_card_subdomain_url, get_shareable_url, get_lan_ip, get_qr_target_url
         from django.test import RequestFactory, override_settings
 
         rf = RequestFactory()
@@ -2592,6 +2592,19 @@ class FrontendFlowTests(TestCase):
         self.assertEqual(missing_res.status_code, 404)
         self.assertContains(missing_res, 'Card Not Found', status_code=404)
         self.assertContains(missing_res, 'unknown-person.192.168.1.34:8000', status_code=404)
+
+        # 7. Verify AWS Hosting Mode (Public EC2 IP and EC2 hostname)
+        req_aws_ip = rf.get('/card/raj/', HTTP_HOST='54.210.12.34:8000')
+        share_url_aws_ip = get_shareable_url(req_aws_ip, f'/card/{card.slug}/')
+        self.assertEqual(share_url_aws_ip, 'http://54.210.12.34:8000/card/raj/')
+        qr_url_aws_ip = get_qr_target_url(card, request=req_aws_ip)
+        self.assertEqual(qr_url_aws_ip, 'http://54.210.12.34:8000/card/raj/')
+
+        req_aws_dns = rf.get('/card/raj/', HTTP_HOST='ec2-54-210-12-34.compute-1.amazonaws.com:8000')
+        share_url_aws_dns = get_shareable_url(req_aws_dns, f'/card/{card.slug}/')
+        self.assertEqual(share_url_aws_dns, 'http://ec2-54-210-12-34.compute-1.amazonaws.com:8000/card/raj/')
+        qr_url_aws_dns = get_qr_target_url(card, request=req_aws_dns)
+        self.assertEqual(qr_url_aws_dns, 'http://ec2-54-210-12-34.compute-1.amazonaws.com:8000/card/raj/')
 
     def test_nfc_order_and_status_dropdown_email_notifications_flow(self):
         """
