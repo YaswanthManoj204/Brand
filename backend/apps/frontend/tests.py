@@ -1,4 +1,5 @@
 import json
+from django.core import mail
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -3047,6 +3048,81 @@ class FrontendFlowTests(TestCase):
         self.assertTrue(nfc_data.get('locked'))
         self.assertEqual(nfc_data.get('theme'), 'titanium_blue')
         self.assertEqual(nfc_data.get('foil'), 'silver')
+
+    def test_enterprise_ceo_add_user_and_send_link_dispatches_email_with_credentials_and_login_link(self):
+        """
+        Verify that when an Enterprise CEO adds an employee in the dashboard:
+        1. Button is 'Add & Send Link'.
+        2. Automated onboarding invitation email is dispatched to employee's work email.
+        3. Email contains employee name, role, company name, login email, initial password, and 1-click login link.
+        4. CEO can also resend the invitation email at any time.
+        """
+        ceo_user = User.objects.create_user('ceo_apex', 'ceo@apexenterprise.com', 'CeoPass123!')
+        EnterpriseCompany.objects.create(
+            name='Apex Global Technologies',
+            email='ceo@apexenterprise.com',
+            card_quota=5,
+            plan_tier='5 Business Cards (Yearly)',
+            is_active=True
+        )
+        UserPlan.objects.create(
+            user=ceo_user,
+            plan_type='enterprise',
+            is_ceo=True,
+            card_limit=5,
+            nfc_card_limit=5,
+            company_name='Apex Global Technologies',
+            billing_cycle='yearly'
+        )
+
+        mail.outbox.clear()
+        self.client.force_login(ceo_user)
+
+        # 1. Verify card_list renders 'Add & Send Link' button
+        res_list = self.client.get(reverse('card_list'))
+        self.assertEqual(res_list.status_code, 200)
+        self.assertContains(res_list, 'Add &amp; Send Link')
+
+        # 2. CEO adds employee: name, work email, role, password
+        emp_payload = {
+            'full_name': 'Sarah Jenkins',
+            'email': 'sarah.jenkins@apexenterprise.com',
+            'employee_role': 'Senior Product Designer',
+            'password': 'ApexSecret@2026',
+        }
+        add_res = self.client.post(reverse('enterprise_add_user'), emp_payload, follow=True)
+        self.assertEqual(add_res.status_code, 200)
+
+        # 3. Verify employee account created
+        emp_user = User.objects.get(email='sarah.jenkins@apexenterprise.com')
+        self.assertEqual(emp_user.first_name, 'Sarah Jenkins')
+        self.assertTrue(emp_user.check_password('ApexSecret@2026'))
+
+        emp_plan = UserPlan.objects.get(user=emp_user)
+        self.assertEqual(emp_plan.enterprise_parent, ceo_user)
+        self.assertEqual(emp_plan.employee_role, 'Senior Product Designer')
+        self.assertEqual(emp_plan.initial_password, 'ApexSecret@2026')
+
+        # 4. Verify email was dispatched to sarah.jenkins@apexenterprise.com
+        emp_emails = [m for m in mail.outbox if 'sarah.jenkins@apexenterprise.com' in m.to]
+        self.assertEqual(len(emp_emails), 1)
+        invite_email = emp_emails[0]
+        self.assertIn('Welcome to Apex Global Technologies!', invite_email.subject)
+        self.assertIn('Digital Business Card', invite_email.subject)
+        self.assertIn('Sarah Jenkins', invite_email.body)
+        self.assertIn('Senior Product Designer', invite_email.body)
+        self.assertIn('sarah.jenkins@apexenterprise.com', invite_email.body)
+        self.assertIn('ApexSecret@2026', invite_email.body)
+        self.assertIn('Apex Global Technologies', invite_email.body)
+        self.assertIn('/login/', invite_email.body)
+
+        # 5. CEO clicks 'Resend Email'
+        mail.outbox.clear()
+        resend_res = self.client.post(reverse('enterprise_resend_invite', kwargs={'user_id': emp_user.id}), follow=True)
+        self.assertEqual(resend_res.status_code, 200)
+        resend_emails = [m for m in mail.outbox if 'sarah.jenkins@apexenterprise.com' in m.to]
+        self.assertEqual(len(resend_emails), 1)
+        self.assertIn('ApexSecret@2026', resend_emails[0].body)
 
 
 

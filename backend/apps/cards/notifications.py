@@ -7,6 +7,132 @@ from django.utils import timezone
 logger = logging.getLogger(__name__)
 
 
+def send_employee_invitation_email(employee_name, employee_email, employee_role, password, login_link, company_name, has_nfc=False):
+    """
+    Sends an automated onboarding invitation email to a newly added enterprise employee
+    with their work email, temporary login password, company details, and 1-click login link.
+    """
+    if not employee_email:
+        return {'success': False, 'error': 'No employee email address provided'}
+
+    subject = f"Welcome to {company_name}! Your Official Digital Business Card Setup"
+    nfc_highlight = " + Smart Contactless NFC Card" if has_nfc else ""
+
+    plain_message = f"""Hello {employee_name or 'Team Member'},
+
+You have been invited by {company_name} to create your official digital business card{nfc_highlight}!
+
+Your card slot has been 100% pre-paid by {company_name}. You can log in, customize your details, and activate your card for ₹0 (Free).
+
+YOUR LOGIN CREDENTIALS:
+- Company: {company_name}
+- Name: {employee_name}
+- Role / Designation: {employee_role or 'Team Member'}
+- Work Email (Login ID): {employee_email}
+- Initial Password: {password}
+
+DIRECT SETUP LINK:
+{login_link}
+
+HOW TO GET STARTED:
+1. Click the setup link above or visit: {login_link}
+2. Log in with your work email and temporary password.
+3. You will be taken directly to the Business Card Studio to add your photo, contact info, and branding.
+{"4. Your custom laser-engraved Smart NFC card will also be ordered for doorstep shipping!" if has_nfc else ""}
+
+Welcome aboard!
+{company_name} & BrandNest Team
+support@brandnest.in | https://brandnest.in
+"""
+
+    html_message = f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F8FAFC; margin: 0; padding: 24px; color: #0F172A; }}
+    .container {{ max-width: 580px; margin: 0 auto; background: #FFFFFF; border-radius: 16px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.04); }}
+    .header {{ background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); color: #FFFFFF; padding: 28px 32px; text-align: left; }}
+    .badge {{ background: #0084FF; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; }}
+    .content {{ padding: 32px; }}
+    .card-box {{ background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin: 24px 0; }}
+    .detail-row {{ display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #E2E8F0; font-size: 13.5px; }}
+    .detail-row:last-child {{ border-bottom: none; }}
+    .detail-label {{ color: #64748B; font-weight: 500; }}
+    .detail-val {{ color: #0F172A; font-weight: 700; text-align: right; }}
+    .btn {{ display: inline-block; background: #0084FF; color: #FFFFFF !important; text-decoration: none; padding: 14px 28px; border-radius: 10px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 14px rgba(0, 132, 255, 0.35); text-align: center; }}
+    .footer {{ background: #F1F5F9; padding: 20px 32px; font-size: 12px; color: #64748B; text-align: center; border-top: 1px solid #E2E8F0; }}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="badge">{company_name} Enterprise Team</span>
+      <h2 style="margin: 10px 0 4px; font-size: 22px;">Welcome to the Team, {employee_name}!</h2>
+      <p style="margin: 0; font-size: 13px; color: #94A3B8;">Your official company digital business card{nfc_highlight} has been provisioned.</p>
+    </div>
+    <div class="content">
+      <p style="font-size: 15px; line-height: 1.6; color: #334155; margin-top: 0;">
+        Hello <strong>{employee_name}</strong>, you've been invited by <strong>{company_name}</strong> to customize and launch your official branded business card.
+      </p>
+
+      <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 10px; padding: 12px 16px; margin: 16px 0; font-size: 13px; color: #166534; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 18px;">🛡️</span>
+        <span><strong>100% Pre-Paid by {company_name}:</strong> You can customize your card, upload your photo, and configure your phone, WhatsApp, and social touchpoints for <strong>₹0 (Free)</strong>.</span>
+      </div>
+
+      <div class="card-box">
+        <div class="detail-row">
+          <span class="detail-label">Company:</span>
+          <span class="detail-val">{company_name}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Assigned Role:</span>
+          <span class="detail-val">{employee_role or 'Team Member'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Work Email (Login ID):</span>
+          <span class="detail-val" style="color: #0084FF;">{employee_email}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Initial Password:</span>
+          <span class="detail-val" style="font-family: monospace; font-size: 14px; background: #E2E8F0; padding: 2px 8px; border-radius: 4px;">{password}</span>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin: 28px 0 16px;">
+        <a href="{login_link}" class="btn">🚀 Log In &amp; Customize My Card &rarr;</a>
+      </div>
+
+      <p style="font-size: 12px; color: #94A3B8; text-align: center; margin: 0;">
+        Clicking the button will log you in directly and open your card customizer.
+      </p>
+    </div>
+    <div class="footer">
+      BrandNest Enterprise Platform &bull; Automated Team Invitations<br>
+      This invitation was issued by {company_name} for {employee_email}.
+    </div>
+  </div>
+</body>
+</html>"""
+
+    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'BrandNest <invites@brandnest.in>')
+    try:
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=default_from,
+            recipient_list=[employee_email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        logger.info(f"Sent employee onboarding invitation email to {employee_email} ({employee_name}) for company {company_name}")
+        return {'success': True, 'recipient': employee_email}
+    except Exception as exc:
+        logger.error(f"Failed to send employee onboarding invitation email to {employee_email}: {exc}")
+        return {'success': False, 'error': str(exc)}
+
+
 def send_plan_expiration_email(recipient_email, recipient_name, plan_name, expires_at, days_left=None, is_enterprise=False, renew_url=None):
     """
     Sends an automated yearly plan expiration warning email to a User's or CEO's Gmail address.

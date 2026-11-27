@@ -787,6 +787,23 @@ def enterprise_add_user(request):
     login_path = f"{reverse('login')}?email={urllib.parse.quote(email)}&next={urllib.parse.quote(builder_path)}"
     shareable_link = get_shareable_url(request, login_path)
 
+    # Automatically dispatch invitation email with login credentials and direct link to employee's work email
+    email_sent = False
+    try:
+        from apps.cards.notifications import send_employee_invitation_email
+        email_res = send_employee_invitation_email(
+            employee_name=full_name or email,
+            employee_email=email,
+            employee_role=employee_role or 'Team Member',
+            password=password,
+            login_link=shareable_link,
+            company_name=quota.get('company_name') or 'Our Company',
+            has_nfc=quota.get('has_nfc', False),
+        )
+        email_sent = email_res.get('success', False)
+    except Exception as exc:
+        logger.error(f"Failed to dispatch employee invitation email to {email}: {exc}")
+
     request.session['just_added_employee'] = {
         'name': full_name or email,
         'email': email,
@@ -795,12 +812,56 @@ def enterprise_add_user(request):
         'link': shareable_link,
         'company_name': quota.get('company_name') or 'Our Company',
         'has_nfc': quota.get('has_nfc', False),
+        'email_sent': email_sent,
     }
 
-    messages.success(
-        request,
-        f'Team member "{full_name or email}" added successfully! Send them their login link and credentials below.'
-    )
+    if email_sent:
+        messages.success(
+            request,
+            f'🎉 Team member "{full_name or email}" added! Login link and credentials have been sent directly to {email}.'
+        )
+    else:
+        messages.success(
+            request,
+            f'Team member "{full_name or email}" added successfully! Login link generated.'
+        )
+    return redirect('card_list')
+
+
+@login_required(login_url='login')
+def enterprise_resend_invite(request, user_id):
+    """
+    Resends the onboarding invitation email with credentials and login link to an existing employee.
+    """
+    if request.method != 'POST':
+        return redirect('card_list')
+
+    emp_plan = get_object_or_404(UserPlan, user_id=user_id, enterprise_parent=request.user)
+    emp_user = emp_plan.user
+    quota = _get_enterprise_quota(request.user)
+
+    builder_path = reverse('card_builder')
+    login_path = f"{reverse('login')}?email={urllib.parse.quote(emp_user.email)}&next={urllib.parse.quote(builder_path)}"
+    shareable_link = get_shareable_url(request, login_path)
+
+    try:
+        from apps.cards.notifications import send_employee_invitation_email
+        res = send_employee_invitation_email(
+            employee_name=emp_user.first_name or emp_user.email,
+            employee_email=emp_user.email,
+            employee_role=emp_plan.employee_role or 'Team Member',
+            password=emp_plan.initial_password or 'Contact your CEO for password',
+            login_link=shareable_link,
+            company_name=quota.get('company_name') or 'Our Company',
+            has_nfc=quota.get('has_nfc', False),
+        )
+        if res.get('success'):
+            messages.success(request, f'✉️ Invitation email with login credentials resent to {emp_user.email}!')
+        else:
+            messages.warning(request, f'Could not send email: {res.get("error", "Unknown error")}')
+    except Exception as exc:
+        messages.error(request, f'Failed to resend email: {exc}')
+
     return redirect('card_list')
 
 

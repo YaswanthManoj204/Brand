@@ -16,6 +16,7 @@ urlpatterns = [
     path('enterprise/checkout/', views.enterprise_checkout, name='enterprise_checkout'),
     path('enterprise/topup/', views.enterprise_topup, name='enterprise_topup'),
     path('enterprise/add-user/', views.enterprise_add_user, name='enterprise_add_user'),
+    path('enterprise/resend-invite/<int:user_id>/', views.enterprise_resend_invite, name='enterprise_resend_invite'),
     path('enterprise/remove-user/<int:user_id>/', views.enterprise_remove_user, name='enterprise_remove_user'),
     path('cards/', views.card_list, name='card_list'),
     path('card/create/', views.card_builder, name='card_builder'),
