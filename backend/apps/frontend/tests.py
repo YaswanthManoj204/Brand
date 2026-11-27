@@ -2755,6 +2755,87 @@ class FrontendFlowTests(TestCase):
             if track_val:
                 self.assertIn(track_val, ent_msg.body)
 
+    def test_dual_session_isolation_client_user_and_admin(self):
+        """
+        Verify that a client user logged into Tab 1 (sessionid cookie)
+        and an administrator logged into Tab 2 (/admin/ or /dashboard/, admin_sessionid cookie)
+        coexist independently in the same browser session without overwriting or logging out each other.
+        """
+        # 1. Create client user and superuser
+        client_user = User.objects.create_user(
+            username='client_rajesh',
+            email='rajesh.tester@brandnest.io',
+            password='ClientPass123!'
+        )
+        admin_user = User.objects.create_superuser(
+            username='super_boss',
+            email='boss@brandnest.io',
+            password='SuperAdminPass123!'
+        )
+
+        # 2. Client logs in via user login endpoint (/login/)
+        res_client_login = self.client.post(reverse('login'), {
+            'login_identifier': 'client_rajesh',
+            'password': 'ClientPass123!',
+        }, follow=True)
+        self.assertEqual(res_client_login.status_code, 200)
+
+        # Verify client session cookie is set
+        self.assertIn('sessionid', self.client.cookies)
+        client_session_key = self.client.cookies['sessionid'].value
+
+        # Client tab visits landing page -> authenticated as client_rajesh
+        landing_res = self.client.get(reverse('landing'))
+        self.assertEqual(landing_res.status_code, 200)
+        self.assertEqual(landing_res.wsgi_request.user.username, 'client_rajesh')
+        self.assertContains(landing_res, 'client_rajesh')
+
+        # 3. In the same browser, user opens /admin/login/ and logs in as super_boss
+        res_admin_login = self.client.post(reverse('admin_login'), {
+            'username': 'super_boss',
+            'password': 'SuperAdminPass123!',
+        }, follow=True)
+        self.assertEqual(res_admin_login.status_code, 200)
+
+        # Verify admin session cookie is set
+        self.assertIn('admin_sessionid', self.client.cookies)
+        admin_session_key = self.client.cookies['admin_sessionid'].value
+
+        # Verify both cookies now exist and have distinct session keys
+        self.assertNotEqual(client_session_key, admin_session_key)
+
+        # Admin tab visits /dashboard/overview/ -> authenticated as super_boss
+        dash_res = self.client.get(reverse('dashboard_overview'))
+        self.assertEqual(dash_res.status_code, 200)
+        self.assertEqual(dash_res.wsgi_request.user.username, 'super_boss')
+
+        # 4. User switches back to client tab (e.g. landing page or /cards/)
+        # Must still be authenticated as client_rajesh, NOT super_boss!
+        client_tab_res = self.client.get(reverse('landing'))
+        self.assertEqual(client_tab_res.status_code, 200)
+        self.assertEqual(client_tab_res.wsgi_request.user.username, 'client_rajesh')
+        self.assertContains(client_tab_res, 'client_rajesh')
+        self.assertNotContains(client_tab_res, 'Signed in as super_boss')
+
+        # 5. Admin logs out from admin dashboard (/admin/logout/)
+        res_admin_logout = self.client.get(reverse('admin_logout'), follow=True)
+        self.assertEqual(res_admin_logout.status_code, 200)
+
+        # Client tab is STILL authenticated as client_rajesh!
+        client_tab_after_admin_logout = self.client.get(reverse('landing'))
+        self.assertEqual(client_tab_after_admin_logout.status_code, 200)
+        self.assertEqual(client_tab_after_admin_logout.wsgi_request.user.username, 'client_rajesh')
+        self.assertContains(client_tab_after_admin_logout, 'client_rajesh')
+
+        # 6. Client logs out from client tab (/logout/)
+        res_client_logout = self.client.get(reverse('logout'), follow=True)
+        self.assertEqual(res_client_logout.status_code, 200)
+
+        # Landing page is now anonymous
+        final_landing = self.client.get(reverse('landing'))
+        self.assertTrue(final_landing.wsgi_request.user.is_anonymous)
+
+
 
 
 

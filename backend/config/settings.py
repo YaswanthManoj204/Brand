@@ -141,7 +141,7 @@ MIDDLEWARE = [
         if (not DEBUG or importlib.util.find_spec('whitenoise'))
         else []
     ),
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'apps.frontend.middleware.DualSessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -312,6 +312,10 @@ else:
     if IS_VERCEL or IS_PRODUCTION:
         CORS_ALLOWED_ORIGIN_REGEXES = [r'^https://.*\.vercel\.app$']
     CORS_ALLOW_CREDENTIALS = True
+
+# Session & Cookie Configuration
+SESSION_COOKIE_NAME = 'sessionid'
+ADMIN_SESSION_COOKIE_NAME = 'admin_sessionid'
 
 # Allow iframe embedding for same-origin builder/template previews
 X_FRAME_OPTIONS = 'SAMEORIGIN'
