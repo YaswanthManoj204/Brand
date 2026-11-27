@@ -3896,6 +3896,15 @@ def enterprise_admin_nfc_orders(request):
         'Delivered'
     ]
 
+    company = CompanySettings.objects.filter(id=1).first() or CompanySettings.objects.first()
+    admin_notification_email = ''
+    if company and company.nfc_order_notification_email:
+        admin_notification_email = company.nfc_order_notification_email
+    elif company and company.contact_email:
+        admin_notification_email = company.contact_email
+    else:
+        admin_notification_email = getattr(settings, 'EMAIL_HOST_USER', 'orders@brandnest.in')
+
     return render(request, 'enterprise_admin/nfc_orders.html', {
         'active_ent_menu': 'nfc_orders',
         'orders': nfc_orders,
@@ -3905,6 +3914,7 @@ def enterprise_admin_nfc_orders(request):
         'filter_mode': filter_mode,
         'is_filtering_new': is_filtering_new,
         'status_options': status_options,
+        'admin_notification_email': admin_notification_email,
     })
 
 

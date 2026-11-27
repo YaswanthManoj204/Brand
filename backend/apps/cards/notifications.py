@@ -166,7 +166,7 @@ def get_admin_nfc_notification_email():
     """
     from apps.cards.models import CompanySettings
     try:
-        comp = CompanySettings.objects.filter(id=1).first()
+        comp = CompanySettings.objects.filter(id=1).first() or CompanySettings.objects.first()
         if comp and comp.nfc_order_notification_email and comp.nfc_order_notification_email.strip():
             return comp.nfc_order_notification_email.strip()
         if comp and comp.contact_email and comp.contact_email.strip():
@@ -180,22 +180,23 @@ def send_super_admin_nfc_order_notification(card, share_url=None):
     """
     Sends an automated email notification to Super Admin whenever a user pays for and publishes
     a customized physical NFC business card, including complete engraving/design specs and shareable link.
+    Guarantees delivery to whichever email is configured in Super Admin NFC Order Notification Email.
     """
     from django.contrib.auth.models import User
 
-    admin_recipients = set()
+    admin_recipients = []
     configured_admin_email = get_admin_nfc_notification_email()
     if configured_admin_email and str(configured_admin_email).strip():
-        admin_recipients.add(str(configured_admin_email).strip())
+        admin_recipients.append(str(configured_admin_email).strip())
 
     for u in User.objects.filter(is_staff=True).exclude(email=''):
         clean_staff_email = u.email.strip()
-        if clean_staff_email and not clean_staff_email.endswith('@example.com'):
-            admin_recipients.add(clean_staff_email)
+        if clean_staff_email and not clean_staff_email.endswith(('@example.com', '@brandnest.io')) and clean_staff_email not in admin_recipients:
+            admin_recipients.append(clean_staff_email)
 
     if not admin_recipients:
-        fallback_email = getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', getattr(settings, 'DEFAULT_FROM_EMAIL', 'admin@brandnest.io'))
-        admin_recipients.add(fallback_email)
+        fallback_email = getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', getattr(settings, 'EMAIL_HOST_USER', 'admin@brandnest.io'))
+        admin_recipients.append(fallback_email)
 
     admin_recipients = list(admin_recipients)
     default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'BrandNest <admin@brandnest.io>')
@@ -214,12 +215,13 @@ def send_super_admin_nfc_order_notification(card, share_url=None):
     company_name = nfc.get('company_name') or card.business_name
     website = nfc.get('website') or card.existing_website or share_url
     status = nfc.get('status', 'Ready for Printing & Dispatch')
-
     subject = f"🔔 New Physical NFC Card Order: {card.business_name} ({card.card_id})"
+    lead_banner = "Physical NFC Card Order Received"
+    lead_desc = "Client submitted custom card design for physical laser printing and express dispatch."
 
-    plain_message = f"""SUPER ADMIN ALERT: New Physical NFC Business Card Order Received!
+    plain_message = f"""SUPER ADMIN ALERT: {lead_banner}!
 
-A client has completed payment and submitted their custom physical NFC card design for production and doorstep shipping.
+{lead_desc}
 
 CLIENT DETAILS:
 - Client Name: {client_name}
@@ -268,8 +270,8 @@ https://brandnest.in/enterprise-admin/nfc-orders/
   <div class="container">
     <div class="header">
       <span class="badge">NFC Production Order</span>
-      <h2 style="margin: 8px 0 2px; font-size: 20px;">Physical NFC Card Order Received</h2>
-      <p style="margin: 0; font-size: 13px; color: #94A3B8;">Client submitted design for physical laser printing and express dispatch.</p>
+      <h2 style="margin: 8px 0 2px; font-size: 20px;">{lead_banner}</h2>
+      <p style="margin: 0; font-size: 13px; color: #94A3B8;">{lead_desc}</p>
     </div>
     <div class="content">
       <div class="section-title">Client & Contact Details</div>
