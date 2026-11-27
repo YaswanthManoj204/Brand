@@ -1140,7 +1140,7 @@ class FrontendFlowTests(TestCase):
         self.assertContains(preview_res, 'Horizon Studio Co')
         self.assertContains(preview_res, 'Paid ₹499')
         self.assertContains(preview_res, 'Razorpay Demo')
-        self.assertContains(preview_res, 'pay_demo_test_998877')
+        self.assertNotContains(preview_res, 'Payment ID')
         self.assertContains(preview_res, 'Download QR')
 
     def test_personal_card_and_nfc_bundle_checkout_flow(self):

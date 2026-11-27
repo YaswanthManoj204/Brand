@@ -118,12 +118,6 @@
                         <span class="text-info fw-semibold text-capitalize">{{ card.layout_config.nfc_card.theme|default:"Obsidian Black"|cut:"_" }} Finish</span>
                     </li>
                     {% endif %}
-                    {% if card.layout_config.payment_receipt.payment_id %}
-                    <li class="d-flex justify-content-between align-items-center border-bottom pb-2">
-                        <span>Payment ID</span>
-                        <code class="text-muted small">{{ card.layout_config.payment_receipt.payment_id }}</code>
-                    </li>
-                    {% endif %}
                     {% if card.existing_website %}
                     <li class="d-flex justify-content-between align-items-center border-bottom pb-2">
                         <span>Website Link</span>
@@ -131,13 +125,9 @@
                             style="max-width: 180px;">{{ card.existing_website }}</a>
                     </li>
                     {% endif %}
-                    <li class="d-flex justify-content-between align-items-center border-bottom pb-2">
+                    <li class="d-flex justify-content-between align-items-center">
                         <span>Template Type</span>
                         <span class="badge bg-primary-subtle text-primary">Pre-made Digital Card</span>
-                    </li>
-                    <li class="d-flex justify-content-between align-items-center">
-                        <span>Total Views</span>
-                        <span class="fw-bold text-dark">{{ card.views_count }}</span>
                     </li>
                 </ul>
 
@@ -159,10 +149,7 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <a href="{% url 'card_list' %}" class="btn btn-primary rounded-pill shadow-sm">
-                        <i class="bi bi-person-badge me-1"></i> View All Cards &amp; Dashboard
-                    </a>
-                    <a href="{% url 'card_edit' card_id=card.card_id %}" class="btn btn-outline-secondary rounded-pill">
+                    <a href="{% url 'card_edit' card_id=card.card_id %}" class="btn btn-primary rounded-pill shadow-sm">
                         <i class="bi bi-pencil-square me-1"></i> Edit This Card
                     </a>
                     <a href="{% url 'landing' %}" class="btn btn-light rounded-pill border">
