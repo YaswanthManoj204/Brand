@@ -139,6 +139,21 @@
             </div>
 
             {% if card.layout_config.nfc_card and card.layout_config.nfc_card.ordered %}
+            {% if not card.layout_config.nfc_card.locked and not card.layout_config.nfc_card.published %}
+            <!-- NFC Publish Callout for Draft Orders -->
+            <div class="card shadow-sm rounded-4 border-0 p-3 mt-3 text-white" style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%); box-shadow: 0 10px 25px rgba(2,132,199,0.25);">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div>
+                        <div class="fw-bold" style="font-size:14px;"><i class="bi bi-broadcast me-1"></i> Ready to send your NFC card to print?</div>
+                        <div style="font-size:12px;opacity:0.9;">Your NFC artwork is in draft mode. Click Publish to lock the physical design and dispatch it to our laser engraving queue.</div>
+                    </div>
+                    <a href="{% url 'card_publish_nfc' card_id=card.card_id %}" onclick="return confirm('Ready to publish?\n\nOnce published, your physical NFC card design will be locked and sent directly to our laser printing and encoding team for manufacturing & shipping.\n\nYou will still be able to edit and update your digital business card anytime for free.\n\nProceed?');" class="btn btn-sm btn-light fw-bold text-primary rounded-pill px-3 py-1.5 shadow-sm">
+                        <i class="bi bi-send-check-fill me-1"></i> Publish NFC for Printing
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Physical Smart NFC Card Preview Section -->
             <div class="card shadow-sm rounded-4 border-0 p-3 mt-3 text-white" style="background: linear-gradient(145deg, #0F172A 0%, #1E293B 100%); border: 1px solid rgba(56,189,248,0.35) !important;">
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom border-white border-opacity-10">
@@ -226,7 +241,10 @@
                 </div>
                 <div class="mt-1 d-flex justify-content-between align-items-center" style="font-size:11.5px;">
                     <span class="text-white-50">Status:</span>
-                    {% with nfc_status=card.layout_config.nfc_card.status|default:"Ready for Dispatch" %}
+                    {% if not card.layout_config.nfc_card.locked and not card.layout_config.nfc_card.published %}
+                        <span class="text-info fw-semibold"><i class="bi bi-pencil-square me-1"></i> Draft Artwork (Pending Publish)</span>
+                    {% else %}
+                    {% with nfc_status=card.layout_config.nfc_card.status|default:"Order Placed" %}
                     {% if nfc_status == 'Shipped' %}
                         <span class="text-warning fw-semibold"><i class="bi bi-truck me-1"></i> Shipped</span>
                     {% elif nfc_status == 'Delivered' %}
@@ -239,6 +257,7 @@
                         <span class="text-success fw-semibold"><i class="bi bi-check-circle-fill me-1"></i> {{ nfc_status }}</span>
                     {% endif %}
                     {% endwith %}
+                    {% endif %}
                 </div>
                 {% if card.layout_config.nfc_card.tracking_info %}
                 <div class="mt-1 pt-1 border-top border-white border-opacity-10 d-flex justify-content-between align-items-center" style="font-size:11px;">

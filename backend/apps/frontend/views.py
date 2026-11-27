@@ -1547,8 +1547,11 @@ def card_builder(request, card_id=None):
                 if nfc_ordered:
                     existing_nfc_status = target_card.layout_config['nfc_card'].get('status') if (target_card and target_card.layout_config and 'nfc_card' in target_card.layout_config) else None
                     existing_nfc_tracking = target_card.layout_config['nfc_card'].get('tracking_info', '') if (target_card and target_card.layout_config and 'nfc_card' in target_card.layout_config) else ''
+                    is_direct_publish = bool(request.POST.get('action_publish_nfc') or request.POST.get('publish_nfc') == 'true' or request.POST.get('publish') == 'true')
                     layout_config['nfc_card'] = {
                         'ordered': True,
+                        'published': is_direct_publish,
+                        'locked': is_direct_publish,
                         'theme': (request.POST.get('nfc_theme') or 'obsidian_black').strip(),
                         'name': (request.POST.get('nfc_name') or request.POST.get('owner_name') or '').strip(),
                         'designation': (request.POST.get('nfc_designation') or role_title or '').strip(),
@@ -1563,9 +1566,11 @@ def card_builder(request, card_id=None):
                         'logo_data': (request.POST.get('nfc_logo_data') or '').strip(),
                         'logo_scale': (request.POST.get('nfc_logo_scale') or '1.0').strip(),
                         'positions': (request.POST.get('nfc_positions') or '{}').strip(),
-                        'status': existing_nfc_status or 'Order Placed',
+                        'status': 'Order Placed' if is_direct_publish else (existing_nfc_status or 'Draft Artwork (Pending Publish)'),
                         'tracking_info': existing_nfc_tracking,
                     }
+                    if is_direct_publish:
+                        layout_config['nfc_card']['published_at'] = timezone.now().strftime('%d %b %Y, %I:%M %p')
                 try:
                     user_plan, _ = UserPlan.objects.get_or_create(user=request.user)
                     if user_plan.plan_type != 'enterprise':
@@ -1582,25 +1587,39 @@ def card_builder(request, card_id=None):
                 if 'payment_receipt' in target_card.layout_config:
                     layout_config['payment_receipt'] = target_card.layout_config['payment_receipt']
                 if 'nfc_card' in target_card.layout_config:
-                    layout_config['nfc_card'] = target_card.layout_config['nfc_card']
-                    # Sync any edited NFC fields if submitted
-                    if request.POST.get('nfc_theme') or request.POST.get('nfc_website') or request.POST.get('nfc_name'):
-                        layout_config['nfc_card'].update({
-                            'theme': (request.POST.get('nfc_theme') or layout_config['nfc_card'].get('theme', 'obsidian_black')).strip(),
-                            'name': (request.POST.get('nfc_name') or layout_config['nfc_card'].get('name', '')).strip(),
-                            'designation': (request.POST.get('nfc_designation') or layout_config['nfc_card'].get('designation', '')).strip(),
-                            'foil': (request.POST.get('nfc_foil') or layout_config['nfc_card'].get('foil', 'gold')).strip(),
-                            'website': (request.POST.get('nfc_website') or layout_config['nfc_card'].get('website', 'www.brandnest.in')).strip(),
-                            'company_name': (request.POST.get('nfc_company_name') or layout_config['nfc_card'].get('company_name', '')).strip(),
-                            'pass_tagline': (request.POST.get('nfc_pass_tagline') or layout_config['nfc_card'].get('pass_tagline', 'BrandNest Smart Pass')).strip(),
-                            'chip_spec': (request.POST.get('nfc_chip_spec') or layout_config['nfc_card'].get('chip_spec', 'NTAG216 · 888 BYTES')).strip(),
-                            'back_tagline': (request.POST.get('nfc_back_tagline') or layout_config['nfc_card'].get('back_tagline', 'SMART CONTACTLESS TOUCHPOINT')).strip(),
-                            'tap_hint': (request.POST.get('nfc_tap_hint') or layout_config['nfc_card'].get('tap_hint', 'Tap against any smartphone to open card')).strip(),
-                            'back_badge': (request.POST.get('nfc_back_badge') or layout_config['nfc_card'].get('back_badge', 'Direct NFC Tap')).strip(),
-                            'logo_data': (request.POST.get('nfc_logo_data') or layout_config['nfc_card'].get('logo_data', '')).strip(),
-                            'logo_scale': (request.POST.get('nfc_logo_scale') or layout_config['nfc_card'].get('logo_scale', '1.0')).strip(),
-                            'positions': (request.POST.get('nfc_positions') or layout_config['nfc_card'].get('positions', '{}')).strip(),
-                        })
+                    existing_nfc = target_card.layout_config['nfc_card']
+                    layout_config['nfc_card'] = dict(existing_nfc)
+                    is_nfc_locked = bool(existing_nfc.get('locked') or existing_nfc.get('published'))
+
+                    if not is_nfc_locked:
+                        # Sync any edited NFC fields while in draft mode
+                        if request.POST.get('nfc_theme') or request.POST.get('nfc_website') or request.POST.get('nfc_name') or request.POST.get('nfc_positions'):
+                            layout_config['nfc_card'].update({
+                                'theme': (request.POST.get('nfc_theme') or layout_config['nfc_card'].get('theme', 'obsidian_black')).strip(),
+                                'name': (request.POST.get('nfc_name') or layout_config['nfc_card'].get('name', '')).strip(),
+                                'designation': (request.POST.get('nfc_designation') or layout_config['nfc_card'].get('designation', '')).strip(),
+                                'foil': (request.POST.get('nfc_foil') or layout_config['nfc_card'].get('foil', 'gold')).strip(),
+                                'website': (request.POST.get('nfc_website') or layout_config['nfc_card'].get('website', 'www.brandnest.in')).strip(),
+                                'company_name': (request.POST.get('nfc_company_name') or layout_config['nfc_card'].get('company_name', '')).strip(),
+                                'pass_tagline': (request.POST.get('nfc_pass_tagline') or layout_config['nfc_card'].get('pass_tagline', 'BrandNest Smart Pass')).strip(),
+                                'chip_spec': (request.POST.get('nfc_chip_spec') or layout_config['nfc_card'].get('chip_spec', 'NTAG216 · 888 BYTES')).strip(),
+                                'back_tagline': (request.POST.get('nfc_back_tagline') or layout_config['nfc_card'].get('back_tagline', 'SMART CONTACTLESS TOUCHPOINT')).strip(),
+                                'tap_hint': (request.POST.get('nfc_tap_hint') or layout_config['nfc_card'].get('tap_hint', 'Tap against any smartphone to open card')).strip(),
+                                'back_badge': (request.POST.get('nfc_back_badge') or layout_config['nfc_card'].get('back_badge', 'Direct NFC Tap')).strip(),
+                                'logo_data': (request.POST.get('nfc_logo_data') or layout_config['nfc_card'].get('logo_data', '')).strip(),
+                                'logo_scale': (request.POST.get('nfc_logo_scale') or layout_config['nfc_card'].get('logo_scale', '1.0')).strip(),
+                                'positions': (request.POST.get('nfc_positions') or layout_config['nfc_card'].get('positions', '{}')).strip(),
+                            })
+
+                        # If user clicked "Publish & Send NFC for Printing":
+                        if request.POST.get('action_publish_nfc') or request.POST.get('publish_nfc') == 'true' or request.POST.get('publish') == 'true':
+                            layout_config['nfc_card']['published'] = True
+                            layout_config['nfc_card']['locked'] = True
+                            layout_config['nfc_card']['status'] = 'Order Placed'
+                            layout_config['nfc_card']['published_at'] = timezone.now().strftime('%d %b %Y, %I:%M %p')
+                    else:
+                        # NFC is LOCKED! Completely preserve original locked NFC specs
+                        layout_config['nfc_card'] = dict(existing_nfc)
 
         # 3. Optional existing website link
         existing_website = (request.POST.get('website') or request.POST.get('existing_website') or '').strip()
@@ -1728,22 +1747,30 @@ def card_builder(request, card_id=None):
 
         quota = _get_enterprise_quota(request.user)
 
-        if (nfc_ordered or quota.get('has_nfc') or (card.layout_config or {}).get('nfc_card', {}).get('ordered')):
+        nfc_data = (card.layout_config or {}).get('nfc_card', {})
+        is_nfc_pub = bool(nfc_data.get('published') or request.POST.get('action_publish_nfc') or request.POST.get('publish_nfc') == 'true')
+
+        if (nfc_ordered or quota.get('has_nfc') or nfc_data.get('ordered')):
             if not NFCTag.objects.filter(card=card).exists():
                 try:
                     NFCTag.objects.create(card=card, nfc_mode='web_card')
                 except Exception:
                     pass
-            try:
-                standalone_path = reverse('card_standalone', kwargs={'slug': card.slug})
-                share_url = get_shareable_url(request, standalone_path)
-                send_super_admin_nfc_order_notification(card, share_url)
-                send_user_nfc_order_placed_notification(card, share_url)
-            except Exception:
-                pass
+            # Super Admin order alert is dispatched when the client publishes their NFC card!
+            if is_nfc_pub:
+                try:
+                    standalone_path = reverse('card_standalone', kwargs={'slug': card.slug})
+                    share_url = get_shareable_url(request, standalone_path)
+                    send_super_admin_nfc_order_notification(card, share_url)
+                    send_user_nfc_order_placed_notification(card, share_url)
+                except Exception:
+                    pass
 
         if target_card and not request.POST.get('razorpay_payment_id') and not quota['is_enterprise']:
-            messages.success(request, f'Business card for "{card.business_name}" updated successfully!')
+            if request.POST.get('action_publish_nfc') or request.POST.get('publish_nfc') == 'true':
+                messages.success(request, f'🎉 Physical NFC Card for "{card.business_name}" published & locked for printing! Your order has been submitted to our production queue. Digital card remains editable anytime.')
+            else:
+                messages.success(request, f'Business card for "{card.business_name}" updated successfully!')
             return redirect('card_preview', card_id=card.card_id)
 
         if quota['is_enterprise']:
@@ -1809,6 +1836,59 @@ def card_delete(request, card_id):
     if BusinessCard.objects.filter(user=request.user).exists():
         return redirect('card_list')
     return redirect('card_builder')
+
+
+@login_required(login_url='login')
+def card_publish_nfc(request, card_id):
+    """
+    Publishes and locks the physical NFC card design for laser printing & shipping.
+    Dispatches production notification to Super Admin and confirmation to client.
+    Locks the NFC hardware specifications, while allowing the user to continue
+    editing their digital business card anytime.
+    """
+    if request.user.is_superuser or request.user.is_staff:
+        card = get_object_or_404(BusinessCard, card_id=card_id)
+    else:
+        card = get_object_or_404(BusinessCard, card_id=card_id, user=request.user)
+
+    cfg = card.layout_config or {}
+    nfc = cfg.get('nfc_card') or {}
+
+    if not nfc.get('ordered'):
+        messages.error(request, 'No physical NFC card order found for this business card.')
+        return redirect('card_edit', card_id=card.card_id)
+
+    if nfc.get('locked') or nfc.get('published'):
+        messages.info(request, 'Your physical NFC card design has already been published and locked for production.')
+        return redirect('card_preview', card_id=card.card_id)
+
+    nfc['published'] = True
+    nfc['locked'] = True
+    nfc['status'] = 'Order Placed'
+    nfc['published_at'] = timezone.now().strftime('%d %b %Y, %I:%M %p')
+    cfg['nfc_card'] = nfc
+    card.layout_config = cfg
+    card.save(update_fields=['layout_config'])
+
+    if not NFCTag.objects.filter(card=card).exists():
+        try:
+            NFCTag.objects.create(card=card, nfc_mode='web_card')
+        except Exception:
+            pass
+
+    try:
+        standalone_path = reverse('card_standalone', kwargs={'slug': card.slug})
+        share_url = get_shareable_url(request, standalone_path)
+        send_super_admin_nfc_order_notification(card, share_url)
+        send_user_nfc_order_placed_notification(card, share_url)
+    except Exception:
+        pass
+
+    messages.success(
+        request,
+        f'🎉 Physical NFC Card for "{card.business_name}" published & locked for printing! Your order has been submitted to our laser production line. Digital card remains editable anytime.'
+    )
+    return redirect('card_preview', card_id=card.card_id)
 
 
 @login_required(login_url='login')
@@ -2648,17 +2728,15 @@ def dashboard_messages(request):
 
 def _has_nfc_hardware(card):
     """
-    Returns True if the card has an order for physical NFC hardware.
+    Returns True if the card has an active published order for physical NFC hardware.
+    Orders reach the Super Admin console once published by the client, while unpublished
+    drafts remain with the client for customizing until they hit publish.
     """
     cfg = card.layout_config or {}
     nfc = cfg.get('nfc_card')
-    if nfc and (nfc.get('ordered') or nfc.get('status')):
+    if nfc and (nfc.get('published') or nfc.get('locked')):
         return True
-    receipt = cfg.get('payment_receipt', {})
-    amount = receipt.get('amount')
-    plan = str(receipt.get('plan') or '')
-    pricing_nfc = PlatformPricing.get_pricing().personal_nfc_price
-    if amount in (999, pricing_nfc) or 'nfc' in plan.lower():
+    if nfc and nfc.get('status') and nfc.get('status') not in ('Draft', 'Draft (Pending Publish)', 'Draft Artwork (Pending Publish)'):
         return True
     return False
 

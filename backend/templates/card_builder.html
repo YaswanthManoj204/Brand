@@ -4923,6 +4923,35 @@
       </div>
       {% elif is_edit %}
       <!-- EDIT MODE: Personal Card Already Paid & Active (No Payment Required) -->
+      {% if card.layout_config.nfc_card and card.layout_config.nfc_card.ordered and card.layout_config.nfc_card.locked or card.layout_config.nfc_card.published %}
+      <div class="alert alert-success rounded-4 border-0 shadow-sm p-3 mb-3 d-flex align-items-center gap-3" style="background:#F0FDF4;border:1px solid #BBF7D0;">
+        <div style="width:42px;height:42px;border-radius:12px;background:#16A34A;color:#fff;display:grid;place-items:center;font-size:20px;flex-shrink:0;">
+          <i class="bi bi-lock-fill"></i>
+        </div>
+        <div style="flex:1;">
+          <h5 style="margin:0 0 2px;font-size:15px;font-weight:700;color:#14532D;">
+            NFC Physical Card Sent to Production &amp; Locked
+          </h5>
+          <p style="margin:0;font-size:12.5px;color:#15803D;">
+            Your physical NFC card design has been published and sent to our printing and chip encoding team. The physical artwork is locked for production. <strong>You can still update your digital business card anytime for free!</strong>
+          </p>
+        </div>
+      </div>
+      {% elif card.layout_config.nfc_card and card.layout_config.nfc_card.ordered %}
+      <div class="alert rounded-4 border-0 shadow-sm p-3 mb-3 d-flex align-items-center gap-3" style="background:#EFF6FF;border:1px solid #BFDBFE;">
+        <div style="width:42px;height:42px;border-radius:12px;background:#0284C7;color:#fff;display:grid;place-items:center;font-size:20px;flex-shrink:0;">
+          <i class="bi bi-palette-fill"></i>
+        </div>
+        <div style="flex:1;">
+          <h5 style="margin:0 0 2px;font-size:15px;font-weight:700;color:#1E3A8A;">
+            Physical NFC Card Paid · Design Draft Mode
+          </h5>
+          <p style="margin:0;font-size:12.5px;color:#1D4ED8;">
+            You can customize your physical NFC card artwork and edit your digital business card as much as you like. When your design is final, click <strong>Publish &amp; Send NFC for Printing</strong> below. Once published, your NFC design will be locked and sent to our printing queue, while your digital business card remains editable anytime.
+          </p>
+        </div>
+      </div>
+      {% else %}
       <div class="alert alert-success rounded-4 border-0 shadow-sm p-3 mb-3 d-flex align-items-center gap-3" style="background:#F0FDF4;border:1px solid #BBF7D0;">
         <div style="width:42px;height:42px;border-radius:12px;background:#16A34A;color:#fff;display:grid;place-items:center;font-size:20px;flex-shrink:0;">
           <i class="bi bi-shield-fill-check"></i>
@@ -4936,6 +4965,7 @@
           </p>
         </div>
       </div>
+      {% endif %}
 
       <div class="submit-packages-grid" style="display:grid;grid-template-columns:1fr;gap:18px;margin-top:16px;">
         <div class="pkg-card" style="background:#ffffff;border:2px solid #16A34A;border-radius:20px;padding:22px;box-shadow:0 6px 20px rgba(15,23,42,0.04);display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
@@ -4948,9 +4978,15 @@
                 YEARLY ACCESS
               </span>
               {% if card.layout_config.nfc_card and card.layout_config.nfc_card.ordered %}
-              <span style="background:#E0F2FE;color:#0284C7;font-weight:700;font-size:11px;padding:3px 10px;border-radius:999px;">
-                <i class="bi bi-broadcast"></i> NFC HARDWARE INCLUDED
-              </span>
+                {% if card.layout_config.nfc_card.locked or card.layout_config.nfc_card.published %}
+                <span style="background:#FEF3C7;color:#B45309;font-weight:700;font-size:11px;padding:3px 10px;border-radius:999px;">
+                  <i class="bi bi-lock-fill"></i> NFC IN PRODUCTION (LOCKED)
+                </span>
+                {% else %}
+                <span style="background:#E0F2FE;color:#0284C7;font-weight:700;font-size:11px;padding:3px 10px;border-radius:999px;">
+                  <i class="bi bi-broadcast"></i> NFC DRAFT (EDITABLE)
+                </span>
+                {% endif %}
               {% endif %}
             </div>
             <h3 style="font-size:18px;font-weight:800;color:var(--ink);margin:0 0 4px;">Save &amp; Update Your Card Details</h3>
@@ -4965,10 +5001,21 @@
             </a>
             {% endif %}
             {% if card.layout_config.nfc_card and card.layout_config.nfc_card.ordered %}
-            <button class="pill" type="button" id="btnCustomizeNfcCard" onclick="window.openNfcStudioModal(event)" style="background:#0F172A;color:#fff;font-weight:700;font-size:14px;padding:12px 20px;border-radius:999px;border:0;display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
-              <i class="bi bi-palette-fill" style="color:#38BDF8;"></i>
-              <span>Customize NFC Card</span>
-            </button>
+              {% if card.layout_config.nfc_card.locked or card.layout_config.nfc_card.published %}
+              <span class="pill" style="background:#0F172A;color:#38BDF8;font-weight:700;font-size:13.5px;padding:12px 20px;border-radius:999px;border:1px solid rgba(56,189,248,0.3);display:inline-flex;align-items:center;gap:6px;" title="Physical NFC design has been locked for laser printing & dispatch">
+                <i class="bi bi-lock-fill" style="color:#FBBF24;"></i>
+                <span>NFC Design Locked (In Production)</span>
+              </span>
+              {% else %}
+              <button class="pill" type="button" id="btnCustomizeNfcCard" onclick="window.openNfcStudioModal(event)" style="background:#0F172A;color:#fff;font-weight:700;font-size:14px;padding:12px 20px;border-radius:999px;border:0;display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+                <i class="bi bi-palette-fill" style="color:#38BDF8;"></i>
+                <span>Customize NFC Card</span>
+              </button>
+              <button class="pill" type="submit" name="action_publish_nfc" value="true" onclick="return window.confirmPublishNfc(event)" style="background:linear-gradient(135deg, #0284C7 0%, #38BDF8 100%);color:#0F172A;font-weight:800;font-size:14px;padding:12px 22px;border-radius:999px;border:0;display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 4px 16px rgba(56,189,248,0.35);">
+                <i class="bi bi-send-check-fill" style="font-size:16px;"></i>
+                <span>Publish &amp; Send NFC for Printing</span>
+              </button>
+              {% endif %}
             {% endif %}
             <button class="pill" type="submit" id="btnUpdateCardDirect" style="background:#16A34A;color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:999px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:0;box-shadow:0 4px 14px rgba(22,163,74,0.3);">
               <i class="bi bi-check2-circle" style="font-size:18px;"></i>
@@ -5180,6 +5227,7 @@
           <span style="color:#FFFFFF;font-weight:600;text-transform:capitalize;">{{ card.layout_config.nfc_card.theme|default:"Obsidian Black"|cut:"_" }} ({{ card.layout_config.nfc_card.foil|default:"Gold"|title }} Foil)</span>
         </div>
 
+        {% if card.layout_config.nfc_card.locked or card.layout_config.nfc_card.published %}
         <div style="margin-top:4px;display:flex;justify-content:space-between;align-items:center;font-size:11.5px;">
           <span style="color:rgba(255,255,255,0.5);">Status:</span>
           {% with nfc_status=card.layout_config.nfc_card.status|default:"Order Placed" %}
@@ -5205,10 +5253,25 @@
         {% endif %}
 
         <div style="margin-top:10px;text-align:center;">
-          <button type="button" onclick="window.openNfcStudioModal(event)" style="background:rgba(255,255,255,0.08);color:#FFFFFF;border:1px solid rgba(255,255,255,0.15);border-radius:999px;font-size:11.5px;font-weight:700;padding:6px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+          <span style="color:#94A3B8;font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+            <i class="bi bi-lock-fill" style="color:#FBBF24;"></i> NFC Design Locked for Laser Printing
+          </span>
+        </div>
+        {% else %}
+        <div style="margin-top:4px;display:flex;justify-content:space-between;align-items:center;font-size:11.5px;">
+          <span style="color:rgba(255,255,255,0.5);">Status:</span>
+          <span style="color:#38BDF8;font-weight:600;"><i class="bi bi-pencil-square me-1"></i> Design Draft (Editable)</span>
+        </div>
+
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;align-items:center;">
+          <button type="button" onclick="window.openNfcStudioModal(event)" style="width:100%;background:rgba(255,255,255,0.08);color:#FFFFFF;border:1px solid rgba(255,255,255,0.15);border-radius:999px;font-size:11.5px;font-weight:700;padding:7px 16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
             <i class="bi bi-sliders text-info"></i> Edit NFC Artwork &amp; Placement &rarr;
           </button>
+          <a href="{% url 'card_publish_nfc' card_id=card.card_id %}" onclick="return window.confirmPublishNfc(event)" style="width:100%;background:linear-gradient(135deg, #0284C7, #38BDF8);color:#0F172A;border-radius:999px;font-size:11.5px;font-weight:800;padding:7px 16px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 10px rgba(56,189,248,0.35);">
+            <i class="bi bi-send-check-fill"></i> Publish NFC for Printing &rarr;
+          </a>
         </div>
+        {% endif %}
       </div>
       {% endif %}
   </main>
@@ -8555,9 +8618,19 @@
       window.hasNfcIncluded = {{ enterprise_quota.has_nfc|yesno:"true,false" }};
       window.isEditMode = {{ is_edit|yesno:"true,false" }};
       window.hasNfcOrderedAlready = {% if card.layout_config.nfc_card and card.layout_config.nfc_card.ordered %}true{% else %}false{% endif %};
+      window.isNfcLocked = {% if card.layout_config.nfc_card and card.layout_config.nfc_card.ordered and card.layout_config.nfc_card.locked or card.layout_config.nfc_card.published %}true{% else %}false{% endif %};
       window.personalNfcUpgradePrice = {{ pricing.personal_nfc_upgrade_price|default:500 }};
       window.cardSlug = "{{ card.slug|default:'' }}";
       window.cardShareUrl = "{{ share_url|default:'' }}";
+
+      window.confirmPublishNfc = function(e) {
+        const ok = confirm("Ready to publish your custom NFC card?\n\nOnce published, your physical NFC card artwork will be locked and sent directly to our laser printing and chip encoding team for physical manufacturing & doorstep shipping.\n\nYou will still be able to edit and update your digital business card anytime for free.\n\nProceed to publish?");
+        if (!ok) {
+          if (e && e.preventDefault) e.preventDefault();
+          return false;
+        }
+        return true;
+      };
 
       window.downloadWalletPass = function() {
         const platform = (walletState && walletState.platform) ? walletState.platform : 'apple';
@@ -8610,6 +8683,11 @@
       // Open NFC Card Studio Modal
       window.openNfcStudioModal = function(e) {
         if (e && e.preventDefault) e.preventDefault();
+
+        if (window.isNfcLocked) {
+          alert("Your physical NFC card design has already been published and sent to our production line.\n\nThe physical artwork is locked for printing & doorstep shipping. You can still update your digital business card anytime!");
+          return false;
+        }
 
         // 1. Validate Business Name first
         const bName = $('business_name');

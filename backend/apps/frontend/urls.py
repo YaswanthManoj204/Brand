@@ -21,6 +21,7 @@ urlpatterns = [
     path('card/create/', views.card_builder, name='card_builder'),
     path('card/edit/<str:card_id>/', views.card_builder, name='card_edit'),
     path('card/delete/<str:card_id>/', views.card_delete, name='card_delete'),
+    path('card/publish-nfc/<str:card_id>/', views.card_publish_nfc, name='card_publish_nfc'),
     path('card/preview/<str:card_id>/', views.card_preview, name='card_preview'),
     path('card/<slug:slug>/qr.png', views.card_qr_image, name='card_qr_image'),
     path('card/<slug:slug>/', views.card_standalone, name='card_standalone'),

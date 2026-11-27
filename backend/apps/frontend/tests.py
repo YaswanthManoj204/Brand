@@ -1754,6 +1754,7 @@ class FrontendFlowTests(TestCase):
             'nfc_designation': 'Director of Robotics',
             'nfc_company_name': 'Arjun Robotics Labs',
             'nfc_website': 'www.arjunrobotics.in',
+            'action_publish_nfc': 'true',
         }
         res = self.client.post(reverse('card_builder'), card_data)
         self.assertEqual(res.status_code, 302)
@@ -2219,6 +2220,7 @@ class FrontendFlowTests(TestCase):
             'nfc_foil': 'gold',
             'nfc_name': 'Vikram Seth',
             'nfc_designation': 'CTO & Co-Founder',
+            'action_publish_nfc': 'true',
         }
         res_post = self.client.post(edit_url, upgrade_data, follow=True)
         self.assertEqual(res_post.status_code, 200)
@@ -2638,6 +2640,7 @@ class FrontendFlowTests(TestCase):
             'nfc_designation': 'Lead Jewelry Designer',
             'nfc_company_name': 'Kavya Fine Jewels',
             'nfc_website': 'www.kavyajewels.com',
+            'action_publish_nfc': 'true',
         }
         res_order = self.client.post(reverse('card_builder'), nfc_payload)
         self.assertEqual(res_order.status_code, 302)
@@ -2891,6 +2894,7 @@ class FrontendFlowTests(TestCase):
             'nfc_designation': 'Creative Director',
             'nfc_company': 'Ananya Couture Studio',
             'nfc_foil': 'gold',
+            'action_publish_nfc': 'true',
         }
         create_res = self.client.post(reverse('card_builder'), nfc_order_data, follow=False)
         self.assertEqual(create_res.status_code, 302)
@@ -2924,6 +2928,125 @@ class FrontendFlowTests(TestCase):
         self.assertGreaterEqual(len(client_msgs), 1)
         self.assertIn('Shipped', client_msgs[0].subject)
         self.assertIn('EXPRESS-99887711', client_msgs[0].body)
+
+    def test_nfc_draft_mode_edit_and_publish_locks_nfc_while_business_card_remains_editable(self):
+        """
+        Verify the exact user lifecycle:
+        1. User pays for Business Card + NFC (₹999).
+        2. Card is created in editable DRAFT mode (nfc_card.ordered=True, locked=False, published=False).
+           Super Admin has NOT received the print order yet.
+        3. User logs in, updates both business card details and NFC design (theme, foil, name).
+           NFC design updates successfully in draft.
+        4. User clicks 'Publish & Send NFC for Printing' (card_publish_nfc).
+           - NFC is now LOCKED (locked=True, published=True, status='Order Placed').
+           - Super Admin receives the print order notification email!
+           - Client receives confirmation.
+        5. User logs in again to edit their business card (e.g. changing phone and bio).
+           - Business card updates successfully!
+           - Physical NFC artwork remains completely LOCKED and protected from changes.
+        """
+        from django.core import mail
+        u = User.objects.create_user(username='nfc_flow_tester', password='Pass1234!', email='nfc.tester@gmail.com')
+        self.client.login(username='nfc_flow_tester', password='Pass1234!')
+
+        mail.outbox.clear()
+
+        # 1. User pays for Business Card + NFC
+        init_payload = {
+            'business_name': 'Quantum Robotics',
+            'owner_name': 'Dev Sharma',
+            'role_title': 'Lead Roboticist',
+            'phone': '+91 9111222333',
+            'email': 'dev@quantumrobotics.com',
+            'razorpay_payment_id': 'pay_demo_quantum_nfc_999',
+            'razorpay_amount': '999',
+            'nfc_ordered': 'true',
+            'nfc_theme': 'obsidian_black',
+            'nfc_foil': 'gold',
+            'nfc_name': 'Dev Sharma',
+            'nfc_designation': 'Lead Roboticist',
+            'nfc_company_name': 'Quantum Robotics',
+        }
+        res_create = self.client.post(reverse('card_builder'), init_payload, follow=False)
+        self.assertEqual(res_create.status_code, 302)
+
+        card = BusinessCard.objects.get(business_name='Quantum Robotics')
+        nfc_data = card.layout_config.get('nfc_card', {})
+        self.assertTrue(nfc_data.get('ordered'))
+        self.assertFalse(nfc_data.get('locked', False))
+        self.assertFalse(nfc_data.get('published', False))
+        # Super admin not notified yet during draft
+        self.assertEqual(len(mail.outbox), 0)
+
+        # 2. User logs in and edits BOTH business card and NFC artwork in draft mode
+        edit_url = reverse('card_edit', kwargs={'card_id': card.card_id})
+        edit_payload = {
+            'business_name': 'Quantum Robotics Global',
+            'owner_name': 'Dr. Dev Sharma',
+            'role_title': 'VP of Autonomous Systems',
+            'phone': '+91 9444555666',
+            'email': 'dev@quantumrobotics.com',
+            'nfc_theme': 'titanium_blue',
+            'nfc_foil': 'silver',
+            'nfc_name': 'Dr. Dev Sharma',
+            'nfc_designation': 'VP of Autonomous Systems',
+            'nfc_company_name': 'Quantum Robotics Global',
+        }
+        res_edit = self.client.post(edit_url, edit_payload, follow=True)
+        self.assertEqual(res_edit.status_code, 200)
+
+        card.refresh_from_db()
+        nfc_data = card.layout_config.get('nfc_card', {})
+        self.assertEqual(card.business_name, 'Quantum Robotics Global')
+        self.assertEqual(nfc_data.get('theme'), 'titanium_blue')
+        self.assertEqual(nfc_data.get('foil'), 'silver')
+        self.assertEqual(nfc_data.get('name'), 'Dr. Dev Sharma')
+        self.assertFalse(nfc_data.get('locked', False))
+        self.assertEqual(len(mail.outbox), 0)
+
+        # 3. User hits PUBLISH to send NFC order to Super Admin & lock the physical card
+        pub_url = reverse('card_publish_nfc', kwargs={'card_id': card.card_id})
+        res_pub = self.client.post(pub_url, follow=True)
+        self.assertEqual(res_pub.status_code, 200)
+
+        card.refresh_from_db()
+        nfc_data = card.layout_config.get('nfc_card', {})
+        self.assertTrue(nfc_data.get('locked'))
+        self.assertTrue(nfc_data.get('published'))
+        self.assertEqual(nfc_data.get('status'), 'Order Placed')
+
+        # Super Admin and client received email notifications!
+        self.assertGreaterEqual(len(mail.outbox), 1)
+        admin_emails = [m for m in mail.outbox if 'admin@brandnest.io' in m.to or 'New Physical NFC' in m.subject]
+        self.assertTrue(len(admin_emails) > 0)
+        self.assertIn('Quantum Robotics Global', admin_emails[0].subject)
+
+        # 4. User edits their digital business card again after NFC is locked
+        mail.outbox.clear()
+        post_locked_edit_payload = {
+            'business_name': 'Quantum Robotics Global Inc',
+            'owner_name': 'Dr. Dev Sharma',
+            'role_title': 'Chief Technology Officer',
+            'phone': '+91 9777888999',
+            'email': 'dev.cto@quantumrobotics.com',
+            # Attempt to change NFC theme/foil after lock should be ignored
+            'nfc_theme': 'royal_gold',
+            'nfc_foil': 'gold',
+        }
+        res_post_edit = self.client.post(edit_url, post_locked_edit_payload, follow=True)
+        self.assertEqual(res_post_edit.status_code, 200)
+
+        card.refresh_from_db()
+        # Digital business card fields UPDATED
+        self.assertEqual(card.business_name, 'Quantum Robotics Global Inc')
+        self.assertEqual(card.phone, '+91 9777888999')
+        self.assertEqual(card.email, 'dev.cto@quantumrobotics.com')
+
+        # Physical NFC card remains locked with original published specs (titanium_blue, silver)
+        nfc_data = card.layout_config.get('nfc_card', {})
+        self.assertTrue(nfc_data.get('locked'))
+        self.assertEqual(nfc_data.get('theme'), 'titanium_blue')
+        self.assertEqual(nfc_data.get('foil'), 'silver')
 
 
 
