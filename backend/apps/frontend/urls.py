@@ -48,6 +48,7 @@ urlpatterns = [
     path('dashboard/messages/', views.dashboard_messages, name='dashboard_messages'),
     path('dashboard/pricing/', views.admin_pricing, name='dashboard_pricing'),
     path('dashboard/nfc/', views.dashboard_nfc, name='dashboard_nfc'),
+    path('dashboard/nfc/settings/email/', views.dashboard_nfc_notification_email_update, name='dashboard_nfc_notification_email_update'),
     path('dashboard/nfc/status/<str:card_id>/', views.dashboard_nfc_status_update, name='dashboard_nfc_status_update'),
     path('dashboard/nfc/add/', views.dashboard_nfc_add, name='dashboard_nfc_add'),
     path('dashboard/nfc/update/<int:tag_id>/', views.dashboard_nfc_update, name='dashboard_nfc_update'),

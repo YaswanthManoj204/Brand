@@ -2835,6 +2835,97 @@ class FrontendFlowTests(TestCase):
         final_landing = self.client.get(reverse('landing'))
         self.assertTrue(final_landing.wsgi_request.user.is_anonymous)
 
+    def test_super_admin_nfc_order_notification_email_configuration_and_client_status_delivery(self):
+        """
+        Verify:
+        1. Super Admin can view and update the admin notification email for incoming NFC orders
+           via the dedicated form at /dashboard/nfc/settings/email/.
+        2. Configured email is persisted in CompanySettings and dynamically retrieved.
+        3. When a new physical NFC order is placed, automated production alert is dispatched
+           to the Super Admin's configured email address.
+        4. Super Admin can change the email address at their will, and subsequent orders
+           immediately notify the newly configured address.
+        5. When Super Admin updates the production/dispatch status for any NFC order (e.g. Shipped),
+           the client is delivered an automated update email to their Client Gmail/Email.
+        """
+        from apps.cards.models import CompanySettings
+        from django.core import mail
+
+        # 1. Setup Admin and client user
+        admin_user = User.objects.create_superuser('chief_admin', 'chief@brandnest.io', 'ChiefPass123!')
+        self.client.force_login(admin_user)
+
+        # 2. Admin views NFC orders dashboard -> sees notification email field
+        dash_res = self.client.get(reverse('dashboard_nfc'))
+        self.assertEqual(dash_res.status_code, 200)
+        self.assertContains(dash_res, 'Super Admin NFC Order Notification Email')
+        self.assertContains(dash_res, 'Save Email')
+
+        # 3. Admin updates notification email to custom address
+        update_email_res = self.client.post(
+            reverse('dashboard_nfc_notification_email_update'),
+            {'nfc_notification_email': 'my_custom_orders@gmail.com'},
+            follow=True
+        )
+        self.assertEqual(update_email_res.status_code, 200)
+        self.assertContains(update_email_res, 'my_custom_orders@gmail.com')
+
+        comp = CompanySettings.objects.get(id=1)
+        self.assertEqual(comp.nfc_order_notification_email, 'my_custom_orders@gmail.com')
+
+        # 4. Client user creates/orders a physical NFC card
+        client_user = User.objects.create_user('client_ananya', 'ananya.personal@gmail.com', 'AnanyaPass123!')
+        mail.outbox.clear()
+
+        self.client.force_login(client_user)
+        nfc_order_data = {
+            'business_name': 'Ananya Couture Studio',
+            'owner_name': 'Ananya Roy',
+            'email': 'ananya.client@gmail.com',
+            'phone': '+919988776655',
+            'razorpay_payment_id': 'pay_demo_ananya_nfc_999',
+            'plan_choice': 'nfc',
+            'nfc_ordered': 'true',
+            'nfc_theme': 'royal_gold',
+            'nfc_name': 'Ananya Roy',
+            'nfc_designation': 'Creative Director',
+            'nfc_company': 'Ananya Couture Studio',
+            'nfc_foil': 'gold',
+        }
+        create_res = self.client.post(reverse('card_builder'), nfc_order_data, follow=False)
+        self.assertEqual(create_res.status_code, 302)
+
+        card = BusinessCard.objects.get(business_name='Ananya Couture Studio')
+
+        # Verify Super Admin received the new NFC order email alert at their configured custom address!
+        admin_alerts = [m for m in mail.outbox if 'my_custom_orders@gmail.com' in m.to]
+        self.assertEqual(len(admin_alerts), 1)
+        self.assertIn('New Physical NFC Card Order', admin_alerts[0].subject)
+        self.assertIn('Ananya Couture Studio', admin_alerts[0].subject)
+        self.assertIn('Royal Gold', admin_alerts[0].body)
+
+        # 5. Admin updates status to 'Shipped' with courier details
+        mail.outbox.clear()
+        self.client.force_login(admin_user)
+
+        status_update_res = self.client.post(
+            reverse('dashboard_nfc_status_update', kwargs={'card_id': card.card_id}),
+            {
+                'status': 'Shipped',
+                'tracking_info': 'BlueDart EXPRESS-99887711',
+            },
+            follow=True
+        )
+        self.assertEqual(status_update_res.status_code, 200)
+
+        # Verify client received the status update email to their Client Gmail/Email!
+        self.assertGreaterEqual(len(mail.outbox), 1)
+        client_msgs = [m for m in mail.outbox if 'ananya.client@gmail.com' in m.to or 'ananya.personal@gmail.com' in m.to]
+        self.assertGreaterEqual(len(client_msgs), 1)
+        self.assertIn('Shipped', client_msgs[0].subject)
+        self.assertIn('EXPRESS-99887711', client_msgs[0].body)
+
+
 
 
 

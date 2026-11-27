@@ -2796,6 +2796,15 @@ def dashboard_nfc(request):
 
     nfc_tags = NFCTag.objects.select_related('card').all()
 
+    company = CompanySettings.objects.filter(id=1).first()
+    admin_notification_email = ''
+    if company and company.nfc_order_notification_email:
+        admin_notification_email = company.nfc_order_notification_email
+    elif company and company.contact_email:
+        admin_notification_email = company.contact_email
+    else:
+        admin_notification_email = getattr(settings, 'EMAIL_HOST_USER', 'orders@brandnest.in')
+
     return render(request, 'dashboard/nfc.html', {
         'active_menu': 'nfc',
         'orders': personal_nfc_orders,
@@ -2806,7 +2815,30 @@ def dashboard_nfc(request):
         'is_filtering_new': is_filtering_new,
         'status_options': status_options,
         'nfc_tags': nfc_tags,
+        'admin_notification_email': admin_notification_email,
     })
+
+
+@dashboard_auth_required
+def dashboard_nfc_notification_email_update(request):
+    """
+    Super Admin endpoint to configure the email address that receives notifications
+    whenever a new physical NFC business card order is placed.
+    """
+    if request.method == 'POST':
+        new_email = request.POST.get('nfc_notification_email', '').strip()
+        if new_email:
+            company, _ = CompanySettings.objects.get_or_create(id=1)
+            company.nfc_order_notification_email = new_email
+            company.save(update_fields=['nfc_order_notification_email'])
+            messages.success(
+                request,
+                f"Admin NFC order notification email updated to '{new_email}'! All new NFC card orders will be alerted to this address."
+            )
+        else:
+            messages.error(request, "Please enter a valid email address.")
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or reverse('dashboard_nfc')
+    return redirect(next_url)
 
 
 @dashboard_auth_required
@@ -2835,12 +2867,23 @@ def dashboard_nfc_status_update(request, card_id):
     card.save(update_fields=['layout_config'])
 
     # Send client update notification
-    send_user_nfc_status_update_notification(card, new_status, tracking_info)
+    result = send_user_nfc_status_update_notification(card, new_status, tracking_info)
 
-    messages.success(
-        request,
-        f"Personal NFC card status for '{card.business_name}' updated to '{new_status}' and client notified!"
-    )
+    if result.get('success'):
+        recipients_str = ', '.join(result.get('recipients', []))
+        messages.success(
+            request,
+            f"Personal NFC card status for '{card.business_name}' updated to '{new_status}' and email delivered to client ({recipients_str})!"
+        )
+    else:
+        messages.warning(
+            request,
+            f"Personal NFC card status updated to '{new_status}', but email delivery failed: {result.get('error')}"
+        )
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
+    if next_url and ('/dashboard/nfc' in next_url or next_url.startswith('?')):
+        return redirect(next_url)
+    return redirect('dashboard_nfc')
     next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
     if next_url and ('/dashboard/nfc' in next_url or next_url.startswith('?')):
         return redirect(next_url)
@@ -3813,12 +3856,19 @@ def enterprise_admin_nfc_status_update(request, card_id):
     card.save(update_fields=['layout_config'])
 
     # Send client update notification
-    send_user_nfc_status_update_notification(card, new_status, tracking_info)
+    result = send_user_nfc_status_update_notification(card, new_status, tracking_info)
 
-    messages.success(
-        request,
-        f"NFC card status for '{card.business_name}' updated to '{new_status}' and client notified!"
-    )
+    if result.get('success'):
+        recipients_str = ', '.join(result.get('recipients', []))
+        messages.success(
+            request,
+            f"NFC card status for '{card.business_name}' updated to '{new_status}' and email delivered to client ({recipients_str})!"
+        )
+    else:
+        messages.warning(
+            request,
+            f"NFC card status updated to '{new_status}', but email delivery failed: {result.get('error')}"
+        )
     next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
     if next_url and ('/enterprise-admin/nfc' in next_url or next_url.startswith('?')):
         return redirect(next_url)

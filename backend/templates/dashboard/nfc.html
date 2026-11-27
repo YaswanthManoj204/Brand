@@ -157,6 +157,35 @@
   </div>
 </div>
 
+<!-- Super Admin NFC Order Email Notification Banner -->
+<div class="card shadow-sm rounded-4 border-0 p-3 mb-4" style="background:#F8FAFC;border:1px solid #E2E8F0 !important;">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <div class="d-flex align-items-center gap-3">
+      <div style="width:40px;height:40px;border-radius:12px;background:#DCFCE7;color:#16A34A;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+        <i class="bi bi-bell-fill"></i>
+      </div>
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <h6 class="mb-0 fw-bold" style="font-size:14px;color:#0F172A;">Super Admin NFC Order Notification Email</h6>
+          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5" style="font-size:10px;">Instant Real-time Alerts</span>
+        </div>
+        <p class="mb-0 text-muted" style="font-size:12px;">Whenever a client places a new physical NFC card order, an automated production alert is sent to this email address.</p>
+      </div>
+    </div>
+    <form method="post" action="{% url 'dashboard_nfc_notification_email_update' %}" class="d-flex align-items-center gap-2 flex-grow-1 flex-md-grow-0" style="max-width:440px;">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-envelope-at-fill text-primary"></i></span>
+        <input type="email" name="nfc_notification_email" class="form-control border-start-0" placeholder="admin@brandnest.io" value="{{ admin_notification_email }}" required style="font-size:12.5px;">
+        <button type="submit" class="btn btn-sm btn-success fw-bold px-3 d-inline-flex align-items-center gap-1 shadow-sm" style="font-size:12px;background:#10B981;border-color:#10B981;">
+          <i class="bi bi-check2"></i> Save Email
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- 6 Key Status Metrics with 1-Click Filters -->
 <div class="row g-3 mb-4">
   <div class="col-6 col-md-4 col-lg-2">
@@ -474,7 +503,7 @@
               <i class="bi bi-truck text-primary me-1"></i> Update Order &amp; Fulfillment Status
             </h6>
             <p class="text-secondary small mb-3" style="font-size:12px;">
-              Updating status synchronizes immediately to the client's preview page and triggers an automated Gmail delivery update.
+              Updating status synchronizes immediately to the client's preview page and triggers an automated Gmail delivery update to <strong>{{ card.email|default:card.user.email }}</strong>.
             </p>
 
             <form method="post" action="{% url 'dashboard_nfc_status_update' card_id=card.card_id %}">

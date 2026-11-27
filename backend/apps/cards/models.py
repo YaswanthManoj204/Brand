@@ -342,6 +342,13 @@ class CompanySettings(models.Model):
     facebook_url = models.URLField(blank=True)
     instagram_url = models.URLField(blank=True)
     
+    # NFC Notification Email
+    nfc_order_notification_email = models.EmailField(
+        blank=True,
+        default='orders@brandnest.in',
+        help_text="Email to receive automated notifications whenever a new NFC order is placed"
+    )
+    
     # Address
     address = models.TextField(blank=True)
     city = models.CharField(max_length=100, blank=True)

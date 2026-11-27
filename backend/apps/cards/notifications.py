@@ -159,6 +159,23 @@ support@brandnest.in | https://brandnest.in
         return {'success': False, 'error': str(exc)}
 
 
+def get_admin_nfc_notification_email():
+    """
+    Fetches the Super Admin configured notification email for incoming physical NFC orders.
+    Checks CompanySettings.nfc_order_notification_email first, then falls back to settings.
+    """
+    from apps.cards.models import CompanySettings
+    try:
+        comp = CompanySettings.objects.filter(id=1).first()
+        if comp and comp.nfc_order_notification_email and comp.nfc_order_notification_email.strip():
+            return comp.nfc_order_notification_email.strip()
+        if comp and comp.contact_email and comp.contact_email.strip():
+            return comp.contact_email.strip()
+    except Exception:
+        pass
+    return getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', getattr(settings, 'EMAIL_HOST_USER', 'orders@brandnest.in'))
+
+
 def send_super_admin_nfc_order_notification(card, share_url=None):
     """
     Sends an automated email notification to Super Admin whenever a user pays for and publishes
@@ -167,11 +184,21 @@ def send_super_admin_nfc_order_notification(card, share_url=None):
     from django.contrib.auth.models import User
 
     admin_recipients = set()
-    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'BrandNest <admin@brandnest.io>')
-    admin_recipients.add(getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', 'admin@brandnest.io'))
+    configured_admin_email = get_admin_nfc_notification_email()
+    if configured_admin_email and str(configured_admin_email).strip():
+        admin_recipients.add(str(configured_admin_email).strip())
+
     for u in User.objects.filter(is_staff=True).exclude(email=''):
-        admin_recipients.add(u.email)
+        clean_staff_email = u.email.strip()
+        if clean_staff_email and not clean_staff_email.endswith('@example.com'):
+            admin_recipients.add(clean_staff_email)
+
+    if not admin_recipients:
+        fallback_email = getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', getattr(settings, 'DEFAULT_FROM_EMAIL', 'admin@brandnest.io'))
+        admin_recipients.add(fallback_email)
+
     admin_recipients = list(admin_recipients)
+    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'BrandNest <admin@brandnest.io>')
 
     nfc = (card.layout_config or {}).get('nfc_card', {})
     client_name = card.owner_name or (card.user.get_full_name() if card.user else '') or card.business_name
@@ -307,14 +334,35 @@ def get_user_notification_email(card):
 def get_user_notification_recipients(card):
     """
     Returns unique recipient email addresses for client notifications,
-    guaranteeing that the account login/signup email is always included.
+    guaranteeing that both the account login/signup email AND the card contact email (e.g. Client Gmail)
+    are always included so the client receives the update without fail.
     """
     recipients = []
-    primary = get_user_notification_email(card)
-    if primary:
-        recipients.append(primary)
-    if card.email and card.email.strip() and card.email.strip() not in recipients:
-        recipients.append(card.email.strip())
+
+    def _add(val):
+        if val and str(val).strip():
+            clean = str(val).strip()
+            if clean not in recipients:
+                recipients.append(clean)
+
+    # 1. Card email (as entered in card contact form, e.g. Client Gmail)
+    if getattr(card, 'email', None):
+        _add(card.email)
+
+    # 2. Card user email (account signup/login email)
+    if getattr(card, 'user', None) and getattr(card.user, 'email', None):
+        _add(card.user.email)
+
+    # 3. Receipt email (from Razorpay / payment receipt)
+    receipt_email = (card.layout_config or {}).get('payment_receipt', {}).get('email')
+    if receipt_email:
+        _add(receipt_email)
+
+    # 4. NFC card configuration email
+    nfc_email = (card.layout_config or {}).get('nfc_card', {}).get('email')
+    if nfc_email:
+        _add(nfc_email)
+
     return recipients
 
 
