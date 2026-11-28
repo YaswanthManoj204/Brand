@@ -346,16 +346,16 @@ PLATFORM_BASE_DOMAIN = os.environ.get('PLATFORM_BASE_DOMAIN', 'sites.brandnest.l
 
 # Jazzmin SaaS Super Admin Settings
 JAZZMIN_SETTINGS = {
-    "site_title": "BrandNest Admin",
-    "site_header": "BrandNest SaaS",
-    "site_brand": "BrandNest Admin",
+    "site_title": "Qkbiz Admin",
+    "site_header": "Qkbiz SaaS",
+    "site_brand": "Qkbiz Admin",
     "site_logo": None,
     "login_logo": None,
     "login_logo_dark": None,
     "site_logo_classes": "img-circle",
     "site_icon": None,
-    "welcome_sign": "Welcome to BrandNest SaaS Control Center",
-    "copyright": "BrandNest Technologies Ltd",
+    "welcome_sign": "Welcome to Qkbiz SaaS Control Center",
+    "copyright": "Qkbiz Technologies Ltd",
     "search_model": ["cards.BusinessCard", "websites.Website", "auth.User"],
     "user_avatar": None,
     "topmenu_links": [
@@ -364,7 +364,7 @@ JAZZMIN_SETTINGS = {
         {"name": "Public Landing", "url": "/", "new_window": True},
     ],
     "usermenu_links": [
-        {"name": "BrandNest Platform", "url": "/", "new_window": True},
+        {"name": "Qkbiz Platform", "url": "/", "new_window": True},
         {"model": "auth.user"},
     ],
     "show_sidebar": True,
@@ -443,7 +443,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '').strip()
 # Automatically activate SMTP backend when Gmail/SMTP credentials are configured
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', f"BrandNest <{EMAIL_HOST_USER}>")
+    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', f"Qkbiz <{EMAIL_HOST_USER}>")
 else:
     EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
-    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'BrandNest Deliveries <orders@brandnest.in>')
+    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Qkbiz Deliveries <orders@qkbiz.in>')

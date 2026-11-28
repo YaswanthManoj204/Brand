@@ -182,7 +182,7 @@ class FrontendFlowTests(TestCase):
         res = self.client.get(reverse('signup'))
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, "Create your account")
-        self.assertContains(res, "BrandNest ID")
+        self.assertContains(res, "Qkbiz ID")
 
     def test_signup_post_success(self):
         post_data = {
@@ -218,7 +218,7 @@ class FrontendFlowTests(TestCase):
         res = self.client.get(reverse('login'))
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, "Welcome back")
-        self.assertContains(res, "Sign in to BrandNest")
+        self.assertContains(res, "Sign in to Qkbiz")
 
     def test_login_post_by_username(self):
         from django.contrib.auth.models import User
@@ -384,8 +384,8 @@ class FrontendFlowTests(TestCase):
         chk_res = self.client.get(reverse('enterprise_checkout'))
         self.assertEqual(chk_res.status_code, 200)
         chk_html = chk_res.content.decode('utf-8')
-        self.assertIn('₹999', chk_html)
-        self.assertIn('₹199.80 / card', chk_html)
+        self.assertIn('₹3745', chk_html)
+        self.assertIn('₹749', chk_html)
         self.assertNotIn('$49', chk_html)
 
         # 2. Activate enterprise plan
@@ -399,14 +399,14 @@ class FrontendFlowTests(TestCase):
         self.assertEqual(topup1.status_code, 302)
         plan.refresh_from_db()
         self.assertEqual(plan.card_limit, 6)
-        self.assertEqual(plan.total_paid, 999 + 199)
+        self.assertEqual(plan.total_paid, 3745 + 749)
 
         # 4. Topup with +3 cards
         topup3 = self.client.post(reverse('enterprise_topup'), {'extra_cards': '3'})
         self.assertEqual(topup3.status_code, 302)
         plan.refresh_from_db()
         self.assertEqual(plan.card_limit, 9)
-        self.assertEqual(plan.total_paid, 999 + 199 + (3 * 199))
+        self.assertEqual(plan.total_paid, 3745 + 749 + (3 * 749))
 
         # 5. Card list renders stepper UI and INR price
         list_res = self.client.get(reverse('card_list'))
@@ -415,7 +415,7 @@ class FrontendFlowTests(TestCase):
         self.assertIn('displayExtraCardsCount', list_html)
         self.assertIn('btnStepPlus', list_html)
         self.assertIn('btnStepMinus', list_html)
-        self.assertIn('₹199', list_html)
+        self.assertIn('₹749', list_html)
         self.assertNotIn('Super Admin', list_html)
         self.assertNotIn('New card limit', list_html)
 
@@ -1120,7 +1120,7 @@ class FrontendFlowTests(TestCase):
         choose_res = self.client.get(reverse('card_choose_plan'))
         self.assertEqual(choose_res.status_code, 200)
         self.assertContains(choose_res, 'For Personal Use')
-        self.assertContains(choose_res, '₹499')
+        self.assertContains(choose_res, '₹999')
         self.assertContains(choose_res, reverse('card_builder'))
 
         # 2. Builder page
@@ -1138,7 +1138,7 @@ class FrontendFlowTests(TestCase):
             'phone': '+91 9845012345',
             'address': 'MG Road, Bangalore, India',
             'razorpay_payment_id': 'pay_demo_test_998877',
-            'razorpay_amount': '499',
+            'razorpay_amount': '999',
             'razorpay_method': 'UPI (Google Pay)',
             'payment_verified': 'true',
         }
@@ -1151,13 +1151,13 @@ class FrontendFlowTests(TestCase):
         self.assertEqual(submit_res['Location'], reverse('card_preview', kwargs={'card_id': card.card_id}))
         receipt = card.layout_config.get('payment_receipt', {})
         self.assertEqual(receipt.get('payment_id'), 'pay_demo_test_998877')
-        self.assertEqual(receipt.get('amount'), 499)
+        self.assertEqual(receipt.get('amount'), 999)
 
         # 5. Follow redirect to card preview
         preview_res = self.client.get(submit_res['Location'])
         self.assertEqual(preview_res.status_code, 200)
         self.assertContains(preview_res, 'Horizon Studio Co')
-        self.assertContains(preview_res, 'Paid ₹499')
+        self.assertContains(preview_res, 'Paid ₹999')
         self.assertContains(preview_res, 'Razorpay Demo')
         self.assertNotContains(preview_res, 'Payment ID')
         self.assertContains(preview_res, 'Download QR')
@@ -1256,9 +1256,9 @@ class FrontendFlowTests(TestCase):
         self.assertContains(res, '5 Business Cards + 5 NFC Cards')
         self.assertContains(res, '10 Business Cards + 10 NFC Cards')
         self.assertContains(res, '15 Business Cards + 15 NFC Cards')
-        self.assertContains(res, '₹2499')
-        self.assertContains(res, '₹4499')
-        self.assertContains(res, '₹5999')
+        self.assertContains(res, '₹4999')
+        self.assertContains(res, '₹8999')
+        self.assertContains(res, '₹12999')
 
         # Purchase 5_nfc bundle
         post_res = self.client.post(reverse('enterprise_checkout'), {'bundle_size': '5_nfc'})
@@ -1269,7 +1269,7 @@ class FrontendFlowTests(TestCase):
         self.assertEqual(plan.plan_type, 'enterprise')
         self.assertEqual(plan.card_limit, 5)
         self.assertEqual(plan.nfc_card_limit, 5)
-        self.assertEqual(plan.total_paid, 2499)
+        self.assertEqual(plan.total_paid, 4999)
 
     def test_enterprise_ceo_add_user_and_employee_free_generation_flow(self):
         """
@@ -1488,7 +1488,7 @@ class FrontendFlowTests(TestCase):
         self.assertEqual(signup_res.status_code, 302)
         kavya = User.objects.get(email='kavya@personalbrand.in')
 
-        # 2. Kavya creates card and pays ₹499 via Razorpay demo
+        # 2. Kavya creates card and pays ₹999 via Razorpay demo
         card_data = {
             'business_name': 'Kavya Design Studio',
             'owner_name': 'Kavya Sharma',
@@ -1496,14 +1496,14 @@ class FrontendFlowTests(TestCase):
             'email': 'kavya@personalbrand.in',
             'phone': '+91 9988776655',
             'razorpay_payment_id': 'pay_demo_kavya12345',
-            'razorpay_amount': '499',
+            'razorpay_amount': '999',
             'razorpay_method': 'UPI (Demo)'
         }
         create_res = self.client.post(reverse('card_builder'), card_data)
         self.assertEqual(create_res.status_code, 302)
         card = BusinessCard.objects.get(user=kavya)
         self.assertEqual(card.business_name, 'Kavya Design Studio')
-        self.assertEqual(card.layout_config['payment_receipt']['amount'], 499)
+        self.assertEqual(card.layout_config['payment_receipt']['amount'], 999)
 
         # 3. Kavya signs out
         self.client.logout()
@@ -1523,7 +1523,7 @@ class FrontendFlowTests(TestCase):
         self.assertEqual(edit_page.status_code, 200)
         self.assertContains(edit_page, 'Business Card Active &amp; Paid (Yearly Plan)')
         self.assertIn('Update & Save Business Card', edit_page.content.decode('utf-8'))
-        self.assertNotContains(edit_page, 'Generate Business Card (₹499)')
+        self.assertNotContains(edit_page, 'Generate Business Card (₹999)')
         self.assertNotContains(edit_page, 'Design NFC Card &amp; Pay (₹999)')
 
         # 6. Kavya updates her card (e.g. changes role and phone) WITHOUT any payment id
@@ -2023,7 +2023,7 @@ class FrontendFlowTests(TestCase):
         choose_res = self.client.get(reverse('card_choose_plan'))
         self.assertEqual(choose_res.status_code, 200)
         self.assertContains(choose_res, '₹699')
-        self.assertContains(choose_res, 'Digital Card (₹699) or Custom Smart NFC Card Bundle (₹1299)')
+        self.assertContains(choose_res, 'Digital Card (₹699 + GST) or Custom Smart NFC Card Bundle')
 
         # 4. Check reflection on /card/build/
         build_res = self.client.get(reverse('card_builder'))
@@ -2069,10 +2069,10 @@ class FrontendFlowTests(TestCase):
         self.assertContains(reset_res, 'Pricing configuration successfully reset to system defaults.')
 
         pricing_reset = PlatformPricing.get_pricing()
-        self.assertEqual(pricing_reset.personal_digital_price, 499)
+        self.assertEqual(pricing_reset.personal_digital_price, 999)
         self.assertEqual(pricing_reset.personal_nfc_price, 999)
-        self.assertEqual(pricing_reset.enterprise_5_digital_price, 999)
-        self.assertEqual(pricing_reset.enterprise_extra_card_price, 199)
+        self.assertEqual(pricing_reset.enterprise_5_digital_price, 3745)
+        self.assertEqual(pricing_reset.enterprise_extra_card_price, 749)
 
     def test_personal_vs_enterprise_full_dashboard_segregation(self):
         """
@@ -2471,7 +2471,7 @@ class FrontendFlowTests(TestCase):
         # 3. Print Sheet Generation for workshop
         sheet_res = self.client.get(reverse('enterprise_admin_nfc_print_sheet', kwargs={'card_id': p_card_new.card_id}))
         self.assertEqual(sheet_res.status_code, 200)
-        self.assertContains(sheet_res, 'BrandNest Hardware Fulfillment')
+        self.assertContains(sheet_res, 'Qkbiz Hardware Fulfillment')
         self.assertContains(sheet_res, 'CR80 FORM FACTOR')
         self.assertContains(sheet_res, 'Kabir Sharma')
         self.assertContains(sheet_res, 'c_p_nfc_new_01')
@@ -2603,7 +2603,7 @@ class FrontendFlowTests(TestCase):
         # 5. Reserved subdomain (e.g. www.192.168.1.34:8000) routes to landing view
         www_res = self.client.get('/', HTTP_HOST='www.192.168.1.34:8000')
         self.assertEqual(www_res.status_code, 200)
-        self.assertContains(www_res, 'BrandNest')
+        self.assertContains(www_res, 'Qkbiz')
 
         # 6. Non-existent subdomain routes to 404 Card Not Found
         missing_res = self.client.get('/', HTTP_HOST='unknown-person.192.168.1.34:8000')

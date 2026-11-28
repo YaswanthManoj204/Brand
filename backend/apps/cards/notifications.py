@@ -41,8 +41,8 @@ HOW TO GET STARTED:
 {"4. Your custom laser-engraved Smart NFC card will also be ordered for doorstep shipping!" if has_nfc else ""}
 
 Welcome aboard!
-{company_name} & BrandNest Team
-support@brandnest.in | https://brandnest.in
+{company_name} & Qkbiz Team
+support@qkbiz.in | https://qkbiz.in
 """
 
     html_message = f"""<!DOCTYPE html>
@@ -109,14 +109,14 @@ support@brandnest.in | https://brandnest.in
       </p>
     </div>
     <div class="footer">
-      BrandNest Enterprise Platform &bull; Automated Team Invitations<br>
+      Qkbiz Enterprise Platform &bull; Automated Team Invitations<br>
       This invitation was issued by {company_name} for {employee_email}.
     </div>
   </div>
 </body>
 </html>"""
 
-    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'BrandNest <invites@brandnest.in>')
+    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'Qkbiz <invites@qkbiz.in>')
     try:
         send_mail(
             subject=subject,
@@ -141,7 +141,7 @@ def send_plan_expiration_email(recipient_email, recipient_name, plan_name, expir
         return {'success': False, 'error': 'No email address provided'}
 
     if not renew_url:
-        renew_url = "https://brandnest.in/enterprise/checkout/" if is_enterprise else "https://brandnest.in/card/choose-plan/"
+        renew_url = "https://qkbiz.in/enterprise/checkout/" if is_enterprise else "https://qkbiz.in/card/choose-plan/"
 
     formatted_exp = expires_at.strftime('%d %B %Y') if isinstance(expires_at, datetime) else str(expires_at)
     if days_left is None:
@@ -151,24 +151,24 @@ def send_plan_expiration_email(recipient_email, recipient_name, plan_name, expir
         else:
             days_left = 30
 
-    role_title = "Enterprise CEO" if is_enterprise else "BrandNest Member"
+    role_title = "Enterprise CEO" if is_enterprise else "Qkbiz Member"
     account_type = "Enterprise Corporate Bundle" if is_enterprise else "Personal Digital Business Card"
 
     if days_left <= 0:
         time_msg = "has expired"
-        urgency = "Action Required: Your BrandNest Plan Has Expired"
+        urgency = "Action Required: Your Qkbiz Plan Has Expired"
     elif days_left == 1:
         time_msg = "expires tomorrow"
-        urgency = f"Urgent: Your BrandNest Plan Expires Tomorrow ({formatted_exp})"
+        urgency = f"Urgent: Your Qkbiz Plan Expires Tomorrow ({formatted_exp})"
     else:
         time_msg = f"is scheduled to expire in {days_left} days on {formatted_exp}"
-        urgency = f"Notice: Your BrandNest {plan_name} Expires Soon ({formatted_exp})"
+        urgency = f"Notice: Your Qkbiz {plan_name} Expires Soon ({formatted_exp})"
 
     subject = urgency
 
     plain_message = f"""Hello {recipient_name or 'Valued Customer'},
 
-This is an automated reminder regarding your BrandNest yearly plan subscription.
+This is an automated reminder regarding your Qkbiz yearly plan subscription.
 
 Your {plan_name} ({account_type}) {time_msg}.
 
@@ -182,11 +182,11 @@ To keep your digital business cards, interactive NFC tap links, QR codes, and te
 
 Renew Your Plan: {renew_url}
 
-Thank you for trusting BrandNest for your professional identity.
+Thank you for trusting Qkbiz for your professional identity.
 
 Warm regards,
-BrandNest Subscriptions & Billing Team
-support@brandnest.in | https://brandnest.in
+Qkbiz Subscriptions & Billing Team
+support@qkbiz.in | https://qkbiz.in
 """
 
     html_message = f"""<!DOCTYPE html>
@@ -261,15 +261,15 @@ support@brandnest.in | https://brandnest.in
       </p>
     </div>
     <div class="footer">
-      BrandNest Global Technologies &bull; Automated Subscription Alerts<br>
-      You received this email because you signed up for BrandNest with {recipient_email}.
+      Qkbiz Global Technologies &bull; Automated Subscription Alerts<br>
+      You received this email because you signed up for Qkbiz with {recipient_email}.
     </div>
   </div>
 </body>
 </html>"""
 
     try:
-        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'BrandNest <renewals@brandnest.in>')
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'Qkbiz <renewals@qkbiz.in>')
         send_mail(
             subject=subject,
             message=plain_message,
@@ -299,7 +299,7 @@ def get_admin_nfc_notification_email():
             return comp.contact_email.strip()
     except Exception:
         pass
-    return getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', getattr(settings, 'EMAIL_HOST_USER', 'orders@brandnest.in'))
+    return getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', getattr(settings, 'EMAIL_HOST_USER', 'orders@qkbiz.in'))
 
 
 def send_super_admin_nfc_order_notification(card, share_url=None):
@@ -317,15 +317,15 @@ def send_super_admin_nfc_order_notification(card, share_url=None):
 
     for u in User.objects.filter(is_staff=True).exclude(email=''):
         clean_staff_email = u.email.strip()
-        if clean_staff_email and not clean_staff_email.endswith(('@example.com', '@brandnest.io')) and clean_staff_email not in admin_recipients:
+        if clean_staff_email and not clean_staff_email.endswith(('@example.com', '@qkbiz.io')) and clean_staff_email not in admin_recipients:
             admin_recipients.append(clean_staff_email)
 
     if not admin_recipients:
-        fallback_email = getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', getattr(settings, 'EMAIL_HOST_USER', 'admin@brandnest.io'))
+        fallback_email = getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', getattr(settings, 'EMAIL_HOST_USER', 'admin@qkbiz.io'))
         admin_recipients.append(fallback_email)
 
     admin_recipients = list(admin_recipients)
-    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'BrandNest <admin@brandnest.io>')
+    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'Qkbiz <admin@qkbiz.io>')
 
     nfc = (card.layout_config or {}).get('nfc_card', {})
     client_name = card.owner_name or (card.user.get_full_name() if card.user else '') or card.business_name
@@ -362,7 +362,7 @@ PHYSICAL NFC CARD SPECIFICATIONS (FOR PRINTING & ENGRAVING):
 - Foil Finish: {foil_name}
 - Front Engraved Name: {card_name}
 - Front Designation: {designation}
-- Front Pass Tagline: {nfc.get('pass_tagline', 'BrandNest Smart Pass')}
+- Front Pass Tagline: {nfc.get('pass_tagline', 'Qkbiz Smart Pass')}
 - Front Chip Spec: {nfc.get('chip_spec', 'NTAG216 · 888 BYTES')}
 - Back Company Name: {company_name}
 - Back Touchpoint Tagline: {nfc.get('back_tagline', 'SMART CONTACTLESS TOUCHPOINT')}
@@ -372,7 +372,7 @@ PHYSICAL NFC CARD SPECIFICATIONS (FOR PRINTING & ENGRAVING):
 - Production Status: {status}
 
 View and print the production artwork sheet or update dispatch status in the Super Admin Console:
-https://brandnest.in/enterprise-admin/nfc-orders/
+https://qkbiz.in/enterprise-admin/nfc-orders/
 """
 
     html_message = f"""<!DOCTYPE html>
@@ -413,14 +413,14 @@ https://brandnest.in/enterprise-admin/nfc-orders/
       <div class="row"><span class="label">Metallic Foil:</span><span class="val">{foil_name}</span></div>
       <div class="row"><span class="label">Front Name:</span><span class="val">{card_name}</span></div>
       <div class="row"><span class="label">Front Designation:</span><span class="val">{designation}</span></div>
-      <div class="row"><span class="label">Front Pass Tagline:</span><span class="val">{nfc.get('pass_tagline', 'BrandNest Smart Pass')}</span></div>
+      <div class="row"><span class="label">Front Pass Tagline:</span><span class="val">{nfc.get('pass_tagline', 'Qkbiz Smart Pass')}</span></div>
       <div class="row"><span class="label">Chip Spec:</span><span class="val">{nfc.get('chip_spec', 'NTAG216 · 888 BYTES')}</span></div>
       <div class="row"><span class="label">Back Company:</span><span class="val">{company_name}</span></div>
       <div class="row"><span class="label">Laser Website URL:</span><span class="val">{website}</span></div>
       <div class="row"><span class="label">Status:</span><span class="val" style="color:#10B981;">{status}</span></div>
 
       <div style="text-align: center;">
-        <a href="https://brandnest.in/enterprise-admin/nfc-orders/" class="btn">Open Super Admin NFC Console &rarr;</a>
+        <a href="https://qkbiz.in/enterprise-admin/nfc-orders/" class="btn">Open Super Admin NFC Console &rarr;</a>
       </div>
     </div>
   </div>
@@ -504,7 +504,7 @@ def send_user_nfc_order_placed_notification(card, share_url=None):
         return {'success': False, 'error': 'No client email found'}
 
     recipient_name = card.owner_name or (card.user.get_full_name() if card.user else '') or card.business_name
-    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'BrandNest Deliveries <orders@brandnest.in>')
+    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'Qkbiz Deliveries <orders@qkbiz.in>')
 
     if not share_url:
         share_url = card.share_url
@@ -516,13 +516,13 @@ def send_user_nfc_order_placed_notification(card, share_url=None):
     designation = nfc.get('designation') or card.tagline or 'Cardholder'
     company_name = nfc.get('company_name') or card.business_name
     chip_spec = nfc.get('chip_spec', 'NTAG216 · 888 BYTES')
-    preview_url = f"https://brandnest.in/card/preview/{card.card_id}/"
+    preview_url = f"https://qkbiz.in/card/preview/{card.card_id}/"
 
     subject = f"🎉 Order Placed: Physical Contactless NFC Card Confirmed ({card.business_name})"
 
     plain_message = f"""Hello {recipient_name},
 
-Thank you for your order! Your BrandNest Physical Contactless NFC Business Card order has been placed and received by our fulfillment center.
+Thank you for your order! Your Qkbiz Physical Contactless NFC Business Card order has been placed and received by our fulfillment center.
 
 ORDER STATUS: Order Placed (Queued for Printing & Engraving)
 
@@ -546,11 +546,11 @@ FULFILLMENT ROADMAP:
 You can preview your 3D card artwork and track order progress anytime at:
 {preview_url}
 
-Thank you for choosing BrandNest!
+Thank you for choosing Qkbiz!
 
 Warm regards,
-BrandNest Hardware Fulfillment Team
-orders@brandnest.in | https://brandnest.in
+Qkbiz Hardware Fulfillment Team
+orders@qkbiz.in | https://qkbiz.in
 """
 
     html_message = f"""<!DOCTYPE html>
@@ -644,7 +644,7 @@ def send_user_nfc_status_update_notification(card, new_status, tracking_info=Non
         return {'success': False, 'error': 'No client email found'}
 
     recipient_name = card.owner_name or (card.user.get_full_name() if card.user else '') or card.business_name
-    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'BrandNest Deliveries <orders@brandnest.in>')
+    default_from = getattr(settings, 'DEFAULT_FROM_EMAIL', 'Qkbiz Deliveries <orders@qkbiz.in>')
 
     nfc = (card.layout_config or {}).get('nfc_card', {})
     theme_name = nfc.get('theme', 'obsidian_black').replace('_', ' ').title()
@@ -653,7 +653,7 @@ def send_user_nfc_status_update_notification(card, new_status, tracking_info=Non
     designation = nfc.get('designation') or card.tagline or 'Cardholder'
     company_name = nfc.get('company_name') or card.business_name
     chip_spec = nfc.get('chip_spec', 'NTAG216 · 888 BYTES')
-    preview_url = f"https://brandnest.in/card/preview/{card.card_id}/"
+    preview_url = f"https://qkbiz.in/card/preview/{card.card_id}/"
     share_url = card.share_url
 
     norm_status = (new_status or '').strip()
@@ -664,7 +664,7 @@ def send_user_nfc_status_update_notification(card, new_status, tracking_info=Non
         badge_bg = '#DBEAFE'
         badge_color = '#1D4ED8'
         step_active = 1
-        subject = f"Order Placed: Your BrandNest Physical NFC Card is Confirmed ({card.business_name})"
+        subject = f"Order Placed: Your Qkbiz Physical NFC Card is Confirmed ({card.business_name})"
         headline = "Your Physical NFC Card Order is Confirmed & Queued"
         stage_desc = "Your order for a custom physical contactless NFC card has been placed and received by our fulfillment center. It is currently queued for laser production and chip encoding."
     elif 'printing' in status_lower or 'engraving' in status_lower or 'production' in status_lower:
@@ -672,7 +672,7 @@ def send_user_nfc_status_update_notification(card, new_status, tracking_info=Non
         badge_bg = '#EDE9FE'
         badge_color = '#6D28D9'
         step_active = 2
-        subject = f"Printing & Engraving: Your BrandNest Physical NFC Card is in Production ({card.business_name})"
+        subject = f"Printing & Engraving: Your Qkbiz Physical NFC Card is in Production ({card.business_name})"
         headline = "Your Physical Card is Being Printed & Laser Engraved"
         stage_desc = "Your custom physical NFC card is actively on our production line! Our hardware team is precision UV laser-engraving your card design, embedding metallic foil accents, and encoding the high-speed contactless smart chip."
     elif 'ready' in status_lower or 'dispatch' in status_lower or 'packed' in status_lower:
@@ -680,7 +680,7 @@ def send_user_nfc_status_update_notification(card, new_status, tracking_info=Non
         badge_bg = '#E0F2FE'
         badge_color = '#0369A1'
         step_active = 3
-        subject = f"Ready for Dispatch: Your BrandNest Physical NFC Card is Packed ({card.business_name})"
+        subject = f"Ready for Dispatch: Your Qkbiz Physical NFC Card is Packed ({card.business_name})"
         headline = "Quality Verified & Ready for Dispatch"
         stage_desc = "Your physical NFC card has completed laser engraving and passed our multi-angle visual inspection and contactless tap verification tests. It is securely packaged and waiting for courier pickup."
     elif 'shipped' in status_lower or 'transit' in status_lower:
@@ -688,7 +688,7 @@ def send_user_nfc_status_update_notification(card, new_status, tracking_info=Non
         badge_bg = '#FEF3C7'
         badge_color = '#B45309'
         step_active = 4
-        subject = f"🚚 Shipped: Your BrandNest Physical NFC Card is On Its Way! ({card.business_name})"
+        subject = f"🚚 Shipped: Your Qkbiz Physical NFC Card is On Its Way! ({card.business_name})"
         headline = "Your NFC Card Has Been Shipped!"
         stage_desc = "Your physical contactless NFC card package has been handed over to our express delivery partner and is en route to your doorstep!"
     elif 'delivered' in status_lower:
@@ -696,17 +696,17 @@ def send_user_nfc_status_update_notification(card, new_status, tracking_info=Non
         badge_bg = '#DCFCE7'
         badge_color = '#15803D'
         step_active = 5
-        subject = f"🎉 Delivered: Your BrandNest Physical NFC Card Has Arrived! ({card.business_name})"
+        subject = f"🎉 Delivered: Your Qkbiz Physical NFC Card Has Arrived! ({card.business_name})"
         headline = "Your NFC Card Has Been Delivered!"
-        stage_desc = "Your BrandNest physical contactless smart card has arrived! Simply tap your card against the top-back of any iPhone or Android phone to instantly share your digital business card profile."
+        stage_desc = "Your Qkbiz physical contactless smart card has arrived! Simply tap your card against the top-back of any iPhone or Android phone to instantly share your digital business card profile."
     else:
         canonical_status = norm_status
         badge_bg = '#F1F5F9'
         badge_color = '#334155'
         step_active = 3
-        subject = f"Update on Your BrandNest Physical NFC Card: {norm_status} ({card.business_name})"
+        subject = f"Update on Your Qkbiz Physical NFC Card: {norm_status} ({card.business_name})"
         headline = f"Status Update: {norm_status}"
-        stage_desc = f"The production status of your BrandNest physical NFC card has been updated to '{norm_status}' by our fulfillment team."
+        stage_desc = f"The production status of your Qkbiz physical NFC card has been updated to '{norm_status}' by our fulfillment team."
 
     tracking_text = f"\nCourier / Tracking Details: {tracking_info}\n" if tracking_info else ""
     tracking_html = f"""
@@ -732,7 +732,7 @@ def send_user_nfc_status_update_notification(card, new_status, tracking_info=Non
 
     plain_message = f"""Hello {recipient_name},
 
-Great news! The fulfillment status of your custom BrandNest Physical NFC Business Card has been updated by our team.
+Great news! The fulfillment status of your custom Qkbiz Physical NFC Business Card has been updated by our team.
 
 CURRENT STATUS: {canonical_status}
 {tracking_text}
@@ -756,11 +756,11 @@ FULFILLMENT STATUS ROADMAP:
 You can preview your card and track fulfillment anytime at:
 {preview_url}
 
-Thank you for choosing BrandNest!
+Thank you for choosing Qkbiz!
 
 Warm regards,
-BrandNest Hardware Fulfillment Team
-orders@brandnest.in | https://brandnest.in
+Qkbiz Hardware Fulfillment Team
+orders@qkbiz.in | https://qkbiz.in
 """
 
     html_message = f"""<!DOCTYPE html>
@@ -786,7 +786,7 @@ orders@brandnest.in | https://brandnest.in
 <body>
   <div class="container">
     <div class="header">
-      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #38BDF8; margin-bottom: 4px;">BrandNest Hardware Fulfillment</div>
+      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #38BDF8; margin-bottom: 4px;">Qkbiz Hardware Fulfillment</div>
       <h2 style="margin: 0 0 6px; font-size: 22px;">{headline}</h2>
       <p style="margin: 0; font-size: 13px; color: #94A3B8;">Physical Contactless NFC Card Order Update</p>
     </div>

@@ -67,10 +67,10 @@
 
             <div class="input-group">
               <span class="input-group-text bg-white fw-bold text-dark" style="font-size:16px;">₹</span>
-              <input type="number" name="personal_digital_price" class="form-control form-control-lg fw-extrabold text-dark" value="{{ pricing.personal_digital_price|default:499 }}" min="0" required>
-              <span class="input-group-text bg-light text-muted small">INR / year</span>
+              <input type="number" name="personal_digital_price" class="form-control form-control-lg fw-extrabold text-dark" value="{{ pricing.personal_digital_price|default:999 }}" min="0" required>
+              <span class="input-group-text bg-light text-muted small">INR / year (+ GST)</span>
             </div>
-            <div class="form-text small mt-1 text-muted">Original default: ₹499/year.</div>
+            <div class="form-text small mt-1 text-muted">Original default: ₹999 + GST/year.</div>
           </div>
         </div>
 
@@ -262,10 +262,10 @@
           <label class="form-label fw-bold text-dark mb-1" style="font-size:14px;">Price per Extra Employee Card Slot</label>
           <div class="input-group">
             <span class="input-group-text bg-white fw-bold text-dark" style="font-size:16px;">₹</span>
-            <input type="number" name="enterprise_extra_card_price" class="form-control form-control-lg fw-extrabold text-dark" value="{{ pricing.enterprise_extra_card_price|default:199 }}" min="0" required>
-            <span class="input-group-text bg-light text-muted small">INR / extra card slot</span>
+            <input type="number" name="enterprise_extra_card_price" class="form-control form-control-lg fw-extrabold text-dark" value="{{ pricing.enterprise_extra_card_price|default:749 }}" min="0" required>
+            <span class="input-group-text bg-light text-muted small">INR / extra card slot (+ GST)</span>
           </div>
-          <div class="form-text small mt-1 text-muted">Original default: ₹199 per additional employee card slot.</div>
+          <div class="form-text small mt-1 text-muted">Original default: ₹749 + GST per additional employee card slot.</div>
         </div>
         <div class="col-md-6 pt-3 pt-md-0 text-secondary small">
           <div class="p-3 bg-light rounded-3 border">

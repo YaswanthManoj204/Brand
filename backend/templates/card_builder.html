@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +6,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>Build your digital business card – BrandNest</title>
+  <title>Build your digital business card – Qkbiz</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -3643,7 +3644,7 @@
 
   <div class="top">
     <nav class="nav" aria-label="Main">
-      <a href="{% url 'landing' %}" class="logo"><span class="mark"></span>BrandNest</a>
+      <a href="{% url 'landing' %}" class="logo"><img src="{% static 'img/qkbiz-logo.png' %}" alt="Qkbiz" style="height:32px;width:auto;"></a>
       <ul>
         <li><a href="{% url 'landing' %}">Home</a></li>
         <li><a href="{% url 'card_builder' %}" aria-current="page">Business Card</a></li>
@@ -5082,7 +5083,8 @@
             </div>
             <h3 style="font-size:17px;font-weight:800;color:var(--ink);margin:0 0 6px;">Digital Business Card</h3>
             <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px;">
-              <span style="font-size:26px;font-weight:800;color:var(--ink);">₹{{ pricing.personal_digital_price|default:499 }}</span>
+              <span style="font-size:26px;font-weight:800;color:var(--ink);">₹{{ pricing.personal_digital_price|default:999 }}</span>
+              <span style="font-size:11px;font-weight:700;color:#2563EB;background:#EFF6FF;border:1px solid #BFDBFE;padding:1px 6px;border-radius:4px;">+ GST</span>
               <span style="font-size:12.5px;color:var(--mute);">/ year</span>
             </div>
             <ul style="list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#475569;">
@@ -5094,7 +5096,7 @@
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="pill" type="button" id="btnGenerateCard" onclick="window.triggerRazorpayForDigital(event)" style="flex:1;background:#0F172A;color:#fff;font-weight:700;font-size:14px;padding:12px 18px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;border:0;">
               <i class="bi bi-lightning-charge-fill" style="color:#FFCE88;"></i>
-              <span>Generate Business Card (₹{{ pricing.personal_digital_price|default:499 }})</span>
+              <span>Generate Business Card (₹{{ pricing.personal_digital_price|default:999 }})</span>
             </button>
           </div>
         </div>
@@ -5187,7 +5189,7 @@
                   </div>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;font-size:8.5px;letter-spacing:0.06em;opacity:0.65;">
-                  <span class="preview-nfc-elem" data-key="front_pass">{{ card.layout_config.nfc_card.pass_tagline|default:"BrandNest Smart Pass" }}</span>
+                  <span class="preview-nfc-elem" data-key="front_pass">{{ card.layout_config.nfc_card.pass_tagline|default:"Qkbiz Smart Pass" }}</span>
                   <span class="preview-nfc-elem" data-key="front_chip_spec">{{ card.layout_config.nfc_card.chip_spec|default:"NTAG216 · 888 BYTES" }}</span>
                 </div>
               </div>
@@ -5776,7 +5778,7 @@
 
   <footer>
     <div class="wrap">
-      <a href="{% url 'landing' %}" class="logo"><span class="mark"></span>BrandNest</a>
+      <a href="{% url 'landing' %}" class="logo"><img src="{% static 'img/qkbiz-logo.png' %}" alt="Qkbiz" style="height:30px;width:auto;"></a>
       <span>Powered by Django REST API and Hostinger Cloud</span>
     </div>
   </footer>
@@ -8108,7 +8110,7 @@
       window.updateLiveCopyright = function (val) {
         const preview = $('cardCopyrightNotice');
         if (preview) {
-          preview.textContent = val.trim() || '© ' + new Date().getFullYear() + ' ' + ($('business_name')?.value.trim() || 'BrandNest') + '. All Rights Reserved.';
+          preview.textContent = val.trim() || '© ' + new Date().getFullYear() + ' ' + ($('business_name')?.value.trim() || 'Qkbiz') + '. All Rights Reserved.';
         }
       };
 
@@ -8671,7 +8673,7 @@
       };
 
       window.__rzpPaymentVerified = false;
-      window.personalDigitalPrice = {{ pricing.personal_digital_price|default:499 }};
+      window.personalDigitalPrice = {{ pricing.personal_digital_price|default:999 }};
       window.personalNfcPrice = {{ pricing.personal_nfc_price|default:999 }};
       window.currentCheckoutAmount = window.personalDigitalPrice;
       window.currentCheckoutTitle = 'Personal Pro Digital Business Card';
@@ -8681,9 +8683,9 @@
         name: '',
         designation: '',
         foil: 'gold',
-        website: 'www.brandnest.in',
+        website: 'www.qkbiz.in',
         companyName: '',
-        passTagline: 'BrandNest Smart Pass',
+        passTagline: 'Qkbiz Smart Pass',
         chipSpec: 'NTAG216 · 888 BYTES',
         backTagline: 'SMART CONTACTLESS TOUCHPOINT',
         tapHint: 'Tap against any smartphone to open card',
@@ -8889,7 +8891,7 @@
         const roleVal = $('nfcInputRole')?.value.trim() || 'Designation';
         const bNameVal = $('nfcInputBackBizName')?.value.trim() || $('business_name')?.value.trim() || 'Your Company';
         const websiteVal = $('nfcInputWebsite')?.value.trim() || 'www.brandnest.in';
-        const passVal = $('nfcInputPassTagline')?.value.trim() || 'BrandNest Smart Pass';
+        const passVal = $('nfcInputPassTagline')?.value.trim() || 'Qkbiz Smart Pass';
         const chipVal = $('nfcInputChipSpec')?.value.trim() || 'NTAG216 · 888 BYTES';
         const backTaglineVal = $('nfcInputBackTagline')?.value.trim() || 'SMART CONTACTLESS TOUCHPOINT';
         const tapHintVal = $('nfcInputTapHint')?.value.trim() || 'Tap against any smartphone to open card';
@@ -9615,7 +9617,7 @@
                   </div>
 
                   <div class="nfc-face-bottom">
-                    <span class="nfc-card-brand nfc-draggable-element nfc-editable-text" id="nfcFrontPassTagline" data-key="front_pass" contenteditable="true" spellcheck="false" title="Click to edit or drag">BrandNest Smart Pass</span>
+                    <span class="nfc-card-brand nfc-draggable-element nfc-editable-text" id="nfcFrontPassTagline" data-key="front_pass" contenteditable="true" spellcheck="false" title="Click to edit or drag">Qkbiz Smart Pass</span>
                     <span class="nfc-chip-spec nfc-draggable-element nfc-editable-text" id="nfcFrontChipSpec" data-key="front_chip_spec" contenteditable="true" spellcheck="false" title="Click to edit or drag">NTAG216 · 888 BYTES</span>
                   </div>
                 </div>
@@ -9699,7 +9701,7 @@
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                 <div class="nfc-input-field">
                   <label for="nfcInputPassTagline">Bottom-Left Pass Tagline</label>
-                  <input type="text" id="nfcInputPassTagline" placeholder="BrandNest Smart Pass" oninput="window.updateNfcCardPreview()">
+                  <input type="text" id="nfcInputPassTagline" placeholder="Qkbiz Smart Pass" oninput="window.updateNfcCardPreview()">
                 </div>
                 <div class="nfc-input-field">
                   <label for="nfcInputChipSpec">Bottom-Right Chip Spec</label>
@@ -9966,7 +9968,7 @@
             <span class="rzp-secured-badge">SECURE</span>
           </div>
           <div class="rzp-merchant-info">
-            <h3 class="rzp-merchant-name">BrandNest Technologies</h3>
+            <h3 class="rzp-merchant-name">Qkbiz Technologies</h3>
             <p class="rzp-product-desc" id="rzpProductDesc">Personal Pro Digital Business Card · Yearly Renewable</p>
           </div>
         </div>

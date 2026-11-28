@@ -418,21 +418,21 @@ class PlatformPricing(models.Model):
     business cards, physical NFC cards, and corporate bundles.
     """
     # Personal Plans
-    personal_digital_price = models.PositiveIntegerField(default=499, help_text="Personal Digital Business Card Price (INR)")
+    personal_digital_price = models.PositiveIntegerField(default=999, help_text="Personal Digital Business Card Price (INR)")
     personal_nfc_price = models.PositiveIntegerField(default=999, help_text="Personal Digital + Physical NFC Card Bundle Price (INR)")
 
-    # Enterprise Digital Bundles
-    enterprise_5_digital_price = models.PositiveIntegerField(default=999, help_text="5 Cards Digital Bundle Price (INR)")
-    enterprise_10_digital_price = models.PositiveIntegerField(default=1799, help_text="10 Cards Digital Bundle Price (INR)")
-    enterprise_15_digital_price = models.PositiveIntegerField(default=2499, help_text="15 Cards Digital Bundle Price (INR)")
+    # Enterprise Digital Bundles (Base rate ₹749 per user / card slot)
+    enterprise_5_digital_price = models.PositiveIntegerField(default=3745, help_text="5 Cards Digital Bundle Price (INR)")
+    enterprise_10_digital_price = models.PositiveIntegerField(default=7490, help_text="10 Cards Digital Bundle Price (INR)")
+    enterprise_15_digital_price = models.PositiveIntegerField(default=11235, help_text="15 Cards Digital Bundle Price (INR)")
 
     # Enterprise Digital + Physical NFC Bundles
-    enterprise_5_nfc_price = models.PositiveIntegerField(default=2499, help_text="5 Cards + 5 NFC Physical Bundle Price (INR)")
-    enterprise_10_nfc_price = models.PositiveIntegerField(default=4499, help_text="10 Cards + 10 NFC Physical Bundle Price (INR)")
-    enterprise_15_nfc_price = models.PositiveIntegerField(default=5999, help_text="15 Cards + 15 NFC Physical Bundle Price (INR)")
+    enterprise_5_nfc_price = models.PositiveIntegerField(default=4999, help_text="5 Cards + 5 NFC Physical Bundle Price (INR)")
+    enterprise_10_nfc_price = models.PositiveIntegerField(default=8999, help_text="10 Cards + 10 NFC Physical Bundle Price (INR)")
+    enterprise_15_nfc_price = models.PositiveIntegerField(default=12999, help_text="15 Cards + 15 NFC Physical Bundle Price (INR)")
 
     # Enterprise Top-up per extra card
-    enterprise_extra_card_price = models.PositiveIntegerField(default=199, help_text="Price per additional enterprise card slot (INR)")
+    enterprise_extra_card_price = models.PositiveIntegerField(default=749, help_text="Price per additional enterprise card slot (INR)")
 
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -466,7 +466,7 @@ class PlatformPricing(models.Model):
                 'nfc_cards': 0,
                 'has_nfc': False,
                 'price': self.enterprise_5_digital_price,
-                'per_card': f"{float(self.enterprise_5_digital_price) / 5:.2f}",
+                'per_card': f"{int(round(float(self.enterprise_5_digital_price) / 5))}",
                 'team_cards': 4,
                 'title': '5 Business Cards',
                 'badge': 'Starter',
@@ -479,7 +479,7 @@ class PlatformPricing(models.Model):
                 'nfc_cards': 0,
                 'has_nfc': False,
                 'price': self.enterprise_10_digital_price,
-                'per_card': f"{float(self.enterprise_10_digital_price) / 10:.2f}",
+                'per_card': f"{int(round(float(self.enterprise_10_digital_price) / 10))}",
                 'team_cards': 9,
                 'title': '10 Business Cards',
                 'badge': 'Most Popular',
@@ -492,7 +492,7 @@ class PlatformPricing(models.Model):
                 'nfc_cards': 0,
                 'has_nfc': False,
                 'price': self.enterprise_15_digital_price,
-                'per_card': f"{float(self.enterprise_15_digital_price) / 15:.2f}",
+                'per_card': f"{int(round(float(self.enterprise_15_digital_price) / 15))}",
                 'team_cards': 14,
                 'title': '15 Business Cards',
                 'badge': 'Best Value',

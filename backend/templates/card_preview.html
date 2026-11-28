@@ -21,7 +21,7 @@
                 </span>
                 {% else %}
                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill">
-                    <i class="bi bi-shield-fill-check me-1"></i> Paid ₹{{ pricing.personal_digital_price|default:499 }} via Razorpay (Demo)
+                    <i class="bi bi-shield-fill-check me-1"></i> Paid ₹{{ pricing.personal_digital_price|default:999 }} via Razorpay (Demo)
                 </span>
                 {% endif %}
             </div>
@@ -85,7 +85,7 @@
                     </span>
                     {% else %}
                     <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small">
-                        <i class="bi bi-shield-check me-1"></i> Paid ₹{{ pricing.personal_digital_price|default:499 }}
+                        <i class="bi bi-shield-check me-1"></i> Paid ₹{{ pricing.personal_digital_price|default:999 }}
                     </span>
                     {% endif %}
                 </div>
@@ -109,7 +109,7 @@
                         {% elif card.layout_config.nfc_card and card.layout_config.nfc_card.ordered %}
                         <span class="text-success fw-semibold"><i class="bi bi-check-circle-fill me-1"></i> Paid ₹{{ pricing.personal_nfc_price|default:999 }} (Digital + NFC Bundle)</span>
                         {% else %}
-                        <span class="text-success fw-semibold"><i class="bi bi-check-circle-fill me-1"></i> Paid ₹{{ pricing.personal_digital_price|default:499 }} (Razorpay Demo)</span>
+                        <span class="text-success fw-semibold"><i class="bi bi-check-circle-fill me-1"></i> Paid ₹{{ pricing.personal_digital_price|default:999 }} (Razorpay Demo)</span>
                         {% endif %}
                     </li>
                     {% if card.layout_config.nfc_card and card.layout_config.nfc_card.ordered %}
@@ -196,7 +196,7 @@
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center" style="font-size:8.5px;letter-spacing:0.06em;opacity:0.65;">
-                                    <span class="preview-nfc-elem" data-key="front_pass">{{ card.layout_config.nfc_card.pass_tagline|default:"BrandNest Smart Pass" }}</span>
+                                    <span class="preview-nfc-elem" data-key="front_pass">{{ card.layout_config.nfc_card.pass_tagline|default:"Qkbiz Smart Pass" }}</span>
                                     <span class="preview-nfc-elem" data-key="front_chip_spec">{{ card.layout_config.nfc_card.chip_spec|default:"NTAG216 · 888 BYTES" }}</span>
                                 </div>
                             </div>

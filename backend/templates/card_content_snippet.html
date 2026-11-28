@@ -2811,7 +2811,7 @@
               </div>
             {% endif %}
             <div class="yt-channel-meta">
-              <div class="yt-channel-name" id="pYtChannelName">{% if card and card.layout_config and card.layout_config.yt_channel_name %}{{ card.layout_config.yt_channel_name }}{% elif card and card.business_name %}{{ card.business_name }}{% elif card and card.owner_name %}{{ card.owner_name }}{% else %}BrandNest Official{% endif %}</div>
+              <div class="yt-channel-name" id="pYtChannelName">{% if card and card.layout_config and card.layout_config.yt_channel_name %}{{ card.layout_config.yt_channel_name }}{% elif card and card.business_name %}{{ card.business_name }}{% elif card and card.owner_name %}{{ card.owner_name }}{% else %}Qkbiz Official{% endif %}</div>
               <div class="yt-channel-subs" id="pYtSubscribers">{{ card.layout_config.yt_subscribers|default:'1.2K Subscribers' }}</div>
             </div>
           </div>
@@ -2896,7 +2896,7 @@
         {% if card.layout_config.settings and card.layout_config.settings.copyright %}
           {{ card.layout_config.settings.copyright }}
         {% else %}
-          &copy; 2026 {{ card.business_name|default:"BrandNest" }}. All Rights Reserved.
+          &copy; 2026 {{ card.business_name|default:"Qkbiz" }}. All Rights Reserved.
         {% endif %}
       </div>
     </div>
@@ -4329,7 +4329,7 @@ window.handlePaymentAction = function(appKey) {
       return;
     }
 
-    const owner = (document.getElementById('pBusinessName')?.textContent || 'BrandNest User').trim();
+    const owner = (document.getElementById('pBusinessName')?.textContent || 'Qkbiz User').trim();
     const params = `pa=${encodeURIComponent(val)}&pn=${encodeURIComponent(owner)}&cu=INR`;
     const upiUrl = `upi://pay?${params}`;
     const ua = navigator.userAgent || '';

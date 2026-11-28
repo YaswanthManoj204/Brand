@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Enterprise Card Bundles – BrandNest</title>
+<title>Enterprise Card Bundles – Qkbiz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -217,7 +218,7 @@ a { color: inherit; text-decoration: none; }
 <body>
 <div class="top">
   <nav class="nav" aria-label="Main Navigation">
-    <a href="{% url 'landing' %}" class="logo"><span class="mark"></span>BrandNest</a>
+    <a href="{% url 'landing' %}" class="logo"><img src="{% static 'img/qkbiz-logo.png' %}" alt="Qkbiz" style="height:34px;width:auto;"></a>
     <div style="display:flex;gap:8px;align-items:center;">
       <a class="pill light" href="{% url 'enterprise_company' %}" title="Back"><i class="bi bi-arrow-left"></i><span class="nav-back-text"> Back</span></a>
       {% if user.is_authenticated %}
@@ -291,8 +292,8 @@ a { color: inherit; text-decoration: none; }
                 </div>
               </div>
               <div class="bundle-price">
-                <div class="amount">₹{{ b.price }}</div>
-                <div class="per-card">₹{{ b.per_card }} / {% if b.has_nfc %}member{% else %}card{% endif %} (yr)</div>
+                <div class="amount">₹{{ b.price }} <span style="font-size:12px;font-weight:700;color:#2563EB;background:#EFF6FF;border:1px solid #BFDBFE;padding:2px 6px;border-radius:4px;vertical-align:middle;">+ GST</span></div>
+                <div class="per-card">₹{{ b.per_card }} + GST / {% if b.has_nfc %}member{% else %}card{% endif %} (yr)</div>
               </div>
             </div>
             {% endfor %}
@@ -334,11 +335,11 @@ a { color: inherit; text-decoration: none; }
           </div>
           <div class="summary-row">
             <span>Rate per card</span>
-            <span id="summaryPerCard">₹{{ selected_per_card }}</span>
+            <span id="summaryPerCard">₹{{ selected_per_card }} + GST</span>
           </div>
           <div class="summary-total">
             <span>Total Due</span>
-            <span id="summaryTotalPrice">₹{{ selected_price }}</span>
+            <span id="summaryTotalPrice">₹{{ selected_price }} <small style="font-size:13px;font-weight:700;color:#2563EB;">+ GST</small></span>
           </div>
 
           <div class="demo-notice">
@@ -376,7 +377,7 @@ a { color: inherit; text-decoration: none; }
         </div>
         <div>
           <div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:7px;">
-            BrandNest SaaS
+            Qkbiz SaaS
             <span style="font-size:10px;font-weight:800;background:#F59E0B;color:#111827;padding:2px 7px;border-radius:4px;letter-spacing:0.04em;">TEST MODE</span>
           </div>
           <div id="rzpOrderDesc" style="font-size:12px;color:#CBD5E1;margin-top:2px;">Enterprise ({{ selected_bundle }} Cards)</div>

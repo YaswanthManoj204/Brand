@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sign Up – BrandNest | Create Your Account</title>
+<title>Sign Up – Qkbiz | Create Your Account</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -574,7 +575,7 @@ footer {
 <!-- Top Navigation -->
 <div class="top">
   <nav class="nav" aria-label="Main Navigation">
-    <a href="{% url 'landing' %}" class="logo"><span class="mark"></span>BrandNest</a>
+    <a href="{% url 'landing' %}" class="logo"><img src="{% static 'img/qkbiz-logo.png' %}" alt="Qkbiz" style="height:34px;width:auto;"></a>
     <ul>
       <li><a href="{% url 'landing' %}">Home</a></li>
       <li><a href="{% url 'card_builder' %}">Business Card</a></li>
@@ -591,7 +592,7 @@ footer {
       <!-- Left Column: Branding Showcase -->
       <div class="auth-showcase">
         <div class="showcase-badge">
-          <span class="showcase-dot"></span> BrandNest ID
+          <span class="showcase-dot"></span> Qkbiz ID
         </div>
         <h1 class="auth-headline">
           Build your digital card &amp; physical NFC pass <b>with zero code.</b>
@@ -757,7 +758,7 @@ footer {
             <!-- Terms & Conditions Checkbox -->
             <label class="form-checkbox-row">
               <input type="checkbox" name="terms" required checked>
-              <span>I agree to BrandNest <a href="{% url 'landing' %}" class="fw-semibold text-dark text-decoration-underline">Terms of Service</a> and <a href="{% url 'landing' %}" class="fw-semibold text-dark text-decoration-underline">Privacy Policy</a>.</span>
+              <span>I agree to Qkbiz <a href="{% url 'landing' %}" class="fw-semibold text-dark text-decoration-underline">Terms of Service</a> and <a href="{% url 'landing' %}" class="fw-semibold text-dark text-decoration-underline">Privacy Policy</a>.</span>
             </label>
 
             <!-- Submit Button -->
@@ -779,7 +780,7 @@ footer {
 <!-- Footer -->
 <div class="wrap">
   <footer>
-    <div class="logo"><span class="mark"></span>BrandNest</div>
+    <div class="logo"><img src="{% static 'img/qkbiz-logo.png' %}" alt="Qkbiz" style="height:30px;width:auto;"></div>
     <div>Digital Business Card & Website Platform • Powered by Django REST API</div>
   </footer>
 </div>

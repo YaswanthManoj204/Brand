@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Choose Your Plan – BrandNest Business Cards</title>
+<title>Choose Your Plan – Qkbiz Business Cards</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -251,7 +252,7 @@ a { color: inherit; text-decoration: none; }
 <body>
 <div class="top">
   <nav class="nav" aria-label="Main Navigation">
-    <a href="{% url 'landing' %}" class="logo"><span class="mark"></span>BrandNest</a>
+    <a href="{% url 'landing' %}" class="logo"><img src="{% static 'img/qkbiz-logo.png' %}" alt="Qkbiz" style="height:34px;width:auto;"></a>
     <div class="nav-actions">
       <a class="pill light nav-back-btn" href="{% url 'landing' %}" title="Back to home">
         <i class="bi bi-arrow-left"></i><span class="nav-back-text"> Back</span>
@@ -283,7 +284,8 @@ a { color: inherit; text-decoration: none; }
           <div class="choice-tag">Individual</div>
           <h2>For Personal Use</h2>
           <div style="display:flex;align-items:baseline;gap:8px;margin:10px 0 16px;">
-            <span style="font-size:32px;font-weight:800;color:var(--ink);letter-spacing:-0.03em;">₹{{ pricing.personal_digital_price|default:499 }}</span>
+            <span style="font-size:32px;font-weight:800;color:var(--ink);letter-spacing:-0.03em;">₹{{ pricing.personal_digital_price|default:999 }}</span>
+            <span style="font-size:12px;font-weight:700;color:#2563EB;background:#EFF6FF;border:1px solid #BFDBFE;padding:2px 7px;border-radius:6px;letter-spacing:0.02em;">+ GST</span>
             <span style="font-size:14px;color:var(--mute);font-weight:600;">/ year (yearly renewable)</span>
           </div>
           <p class="choice-desc">
@@ -291,7 +293,7 @@ a { color: inherit; text-decoration: none; }
           </p>
           <ul class="choice-list">
             <li><i class="bi bi-check-circle-fill"></i> Log in or sign up to start building</li>
-            <li><i class="bi bi-check-circle-fill"></i> Digital Card (₹{{ pricing.personal_digital_price|default:499 }}) or Custom Smart NFC Card Bundle (₹{{ pricing.personal_nfc_price|default:999 }})</li>
+            <li><i class="bi bi-check-circle-fill"></i> Digital Card (₹{{ pricing.personal_digital_price|default:999 }} + GST) or Custom Smart NFC Card Bundle</li>
             <li><i class="bi bi-check-circle-fill"></i> Interactive mobile preview &amp; live QR code</li>
             <li><i class="bi bi-check-circle-fill"></i> Payments, brochure, socials &amp; vCard export</li>
           </ul>
@@ -308,13 +310,18 @@ a { color: inherit; text-decoration: none; }
           <div class="choice-icon"><i class="bi bi-buildings"></i></div>
           <div class="choice-tag">Teams &amp; Companies</div>
           <h2>For Enterprise</h2>
+          <div style="display:flex;align-items:baseline;gap:8px;margin:10px 0 16px;">
+            <span style="font-size:32px;font-weight:800;color:#FFFFFF;letter-spacing:-0.03em;">₹{{ pricing.enterprise_extra_card_price|default:749 }}</span>
+            <span style="font-size:12px;font-weight:700;color:#93C5FD;background:rgba(59,130,246,0.25);border:1px solid rgba(147,197,253,0.3);padding:2px 7px;border-radius:6px;letter-spacing:0.02em;">+ GST</span>
+            <span style="font-size:14px;color:rgba(255,255,255,0.7);font-weight:600;">/ card / year</span>
+          </div>
           <p class="choice-desc">
             Start with a 5 business card bundle for you and your team, and easily add more cards one-by-one anytime.
           </p>
           <ul class="choice-list">
-            <li><i class="bi bi-check-circle-fill"></i> Starter 5-card bundle + add individual cards anytime</li>
-            <li><i class="bi bi-check-circle-fill"></i> Same powerful BrandNest card builder per member</li>
-            <li><i class="bi bi-check-circle-fill"></i> Expand your card bundle anytime (+1, +2, etc.)</li>
+            <li><i class="bi bi-check-circle-fill"></i> Starter 5-card bundle (₹{{ pricing.enterprise_5_digital_price|default:3745 }} + GST) + add individual cards anytime</li>
+            <li><i class="bi bi-check-circle-fill"></i> Same powerful Qkbiz card builder per member</li>
+            <li><i class="bi bi-check-circle-fill"></i> Expand your card bundle anytime (+1, +2, etc.) at ₹{{ pricing.enterprise_extra_card_price|default:749 }} + GST</li>
           </ul>
         </div>
         <a href="{% url 'enterprise_company' %}" class="pill blue full" id="btnChooseEnterprise">

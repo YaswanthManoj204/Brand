@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Log In – BrandNest | Sign In to Your Account</title>
+<title>Log In – Qkbiz | Sign In to Your Account</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -558,7 +559,7 @@ footer {
 <!-- Top Navigation -->
 <div class="top">
   <nav class="nav" aria-label="Main Navigation">
-    <a href="{% url 'landing' %}" class="logo"><span class="mark"></span>BrandNest</a>
+    <a href="{% url 'landing' %}" class="logo"><img src="{% static 'img/qkbiz-logo.png' %}" alt="Qkbiz" style="height:34px;width:auto;"></a>
     <ul>
       <li><a href="{% url 'landing' %}">Home</a></li>
       <li><a href="{% url 'card_builder' %}">Business Card</a></li>
@@ -635,7 +636,7 @@ footer {
         <div class="auth-card">
           <div class="auth-card-hd">
             <h2 class="auth-card-title">Welcome back</h2>
-            <p class="auth-card-desc">Sign in to your BrandNest account to continue.</p>
+            <p class="auth-card-desc">Sign in to your Qkbiz account to continue.</p>
           </div>
 
           <!-- Alert Messages -->
@@ -708,7 +709,7 @@ footer {
 
             <!-- Submit Button -->
             <button type="submit" class="pill full">
-              <span>Sign in to BrandNest</span>
+              <span>Sign in to Qkbiz</span>
               <i class="bi bi-arrow-right"></i>
             </button>
           </form>
@@ -725,7 +726,7 @@ footer {
 <!-- Footer -->
 <div class="wrap">
   <footer>
-    <div class="logo"><span class="mark"></span>BrandNest</div>
+    <div class="logo"><img src="{% static 'img/qkbiz-logo.png' %}" alt="Qkbiz" style="height:30px;width:auto;"></div>
     <div>Digital Business Card & Website Platform • Powered by Django REST API</div>
   </footer>
 </div>

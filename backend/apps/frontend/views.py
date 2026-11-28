@@ -72,7 +72,7 @@ def get_enterprise_bundles():
 def get_extra_card_price():
     return PlatformPricing.get_pricing().enterprise_extra_card_price
 
-EXTRA_CARD_PRICE_INR = 199
+EXTRA_CARD_PRICE_INR = 749
 
 
 def _get_enterprise_quota(user):
@@ -712,7 +712,7 @@ def enterprise_topup(request):
     if extra_cards < 1:
         extra_cards = 1
 
-    total_cost = extra_cards * EXTRA_CARD_PRICE_INR
+    total_cost = extra_cards * get_extra_card_price()
     plan, _ = UserPlan.objects.get_or_create(user=request.user)
     if plan.plan_type != 'enterprise':
         plan.plan_type = 'enterprise'
@@ -1579,7 +1579,7 @@ def card_builder(request, card_id=None):
         razorpay_payment_id = (request.POST.get('razorpay_payment_id') or '').strip()
         razorpay_amount = (request.POST.get('razorpay_amount') or str(pricing_inst.personal_digital_price)).strip()
         razorpay_method = (request.POST.get('razorpay_method') or 'UPI / Card (Demo)').strip()
-        nfc_ordered = request.POST.get('nfc_ordered', 'false').lower() in ('true', '1') or razorpay_amount in (str(pricing_inst.personal_nfc_price), '999')
+        nfc_ordered = request.POST.get('nfc_ordered', 'false').lower() in ('true', '1') or request.POST.get('action') == 'order_nfc'
 
         quota = _get_enterprise_quota(request.user)
         if quota['is_enterprise']:
@@ -1604,9 +1604,9 @@ def card_builder(request, card_id=None):
                     'name': (request.POST.get('nfc_name') or request.POST.get('owner_name') or '').strip(),
                     'designation': (request.POST.get('nfc_designation') or role_title or '').strip(),
                     'foil': (request.POST.get('nfc_foil') or 'gold').strip(),
-                    'website': (request.POST.get('nfc_website') or request.POST.get('website') or request.POST.get('existing_website') or 'www.brandnest.in').strip(),
+                    'website': (request.POST.get('nfc_website') or request.POST.get('website') or request.POST.get('existing_website') or 'www.qkbiz.in').strip(),
                     'company_name': (request.POST.get('nfc_company_name') or request.POST.get('business_name') or company_name_val).strip(),
-                    'pass_tagline': (request.POST.get('nfc_pass_tagline') or 'BrandNest Smart Pass').strip(),
+                    'pass_tagline': (request.POST.get('nfc_pass_tagline') or 'Qkbiz Smart Pass').strip(),
                     'chip_spec': (request.POST.get('nfc_chip_spec') or 'NTAG216 · 888 BYTES').strip(),
                     'back_tagline': (request.POST.get('nfc_back_tagline') or 'SMART CONTACTLESS TOUCHPOINT').strip(),
                     'tap_hint': (request.POST.get('nfc_tap_hint') or 'Tap against any smartphone to open card').strip(),
@@ -1625,9 +1625,9 @@ def card_builder(request, card_id=None):
                         'name': (request.POST.get('nfc_name') or layout_config['nfc_card'].get('name', '')).strip(),
                         'designation': (request.POST.get('nfc_designation') or layout_config['nfc_card'].get('designation', '')).strip(),
                         'foil': (request.POST.get('nfc_foil') or layout_config['nfc_card'].get('foil', 'gold')).strip(),
-                        'website': (request.POST.get('nfc_website') or layout_config['nfc_card'].get('website', 'www.brandnest.in')).strip(),
+                        'website': (request.POST.get('nfc_website') or layout_config['nfc_card'].get('website', 'www.qkbiz.in')).strip(),
                         'company_name': (request.POST.get('nfc_company_name') or layout_config['nfc_card'].get('company_name', '')).strip(),
-                        'pass_tagline': (request.POST.get('nfc_pass_tagline') or layout_config['nfc_card'].get('pass_tagline', 'BrandNest Smart Pass')).strip(),
+                        'pass_tagline': (request.POST.get('nfc_pass_tagline') or layout_config['nfc_card'].get('pass_tagline', 'Qkbiz Smart Pass')).strip(),
                         'chip_spec': (request.POST.get('nfc_chip_spec') or layout_config['nfc_card'].get('chip_spec', 'NTAG216 · 888 BYTES')).strip(),
                         'back_tagline': (request.POST.get('nfc_back_tagline') or layout_config['nfc_card'].get('back_tagline', 'SMART CONTACTLESS TOUCHPOINT')).strip(),
                         'tap_hint': (request.POST.get('nfc_tap_hint') or layout_config['nfc_card'].get('tap_hint', 'Tap against any smartphone to open card')).strip(),
@@ -1667,9 +1667,9 @@ def card_builder(request, card_id=None):
                         'name': (request.POST.get('nfc_name') or request.POST.get('owner_name') or '').strip(),
                         'designation': (request.POST.get('nfc_designation') or role_title or '').strip(),
                         'foil': (request.POST.get('nfc_foil') or 'gold').strip(),
-                        'website': (request.POST.get('nfc_website') or request.POST.get('website') or request.POST.get('existing_website') or 'www.brandnest.in').strip(),
+                        'website': (request.POST.get('nfc_website') or request.POST.get('website') or request.POST.get('existing_website') or 'www.qkbiz.in').strip(),
                         'company_name': (request.POST.get('nfc_company_name') or request.POST.get('business_name') or '').strip(),
-                        'pass_tagline': (request.POST.get('nfc_pass_tagline') or 'BrandNest Smart Pass').strip(),
+                        'pass_tagline': (request.POST.get('nfc_pass_tagline') or 'Qkbiz Smart Pass').strip(),
                         'chip_spec': (request.POST.get('nfc_chip_spec') or 'NTAG216 · 888 BYTES').strip(),
                         'back_tagline': (request.POST.get('nfc_back_tagline') or 'SMART CONTACTLESS TOUCHPOINT').strip(),
                         'tap_hint': (request.POST.get('nfc_tap_hint') or 'Tap against any smartphone to open card').strip(),
@@ -1710,9 +1710,9 @@ def card_builder(request, card_id=None):
                                 'name': (request.POST.get('nfc_name') or layout_config['nfc_card'].get('name', '')).strip(),
                                 'designation': (request.POST.get('nfc_designation') or layout_config['nfc_card'].get('designation', '')).strip(),
                                 'foil': (request.POST.get('nfc_foil') or layout_config['nfc_card'].get('foil', 'gold')).strip(),
-                                'website': (request.POST.get('nfc_website') or layout_config['nfc_card'].get('website', 'www.brandnest.in')).strip(),
+                                'website': (request.POST.get('nfc_website') or layout_config['nfc_card'].get('website', 'www.qkbiz.in')).strip(),
                                 'company_name': (request.POST.get('nfc_company_name') or layout_config['nfc_card'].get('company_name', '')).strip(),
-                                'pass_tagline': (request.POST.get('nfc_pass_tagline') or layout_config['nfc_card'].get('pass_tagline', 'BrandNest Smart Pass')).strip(),
+                                'pass_tagline': (request.POST.get('nfc_pass_tagline') or layout_config['nfc_card'].get('pass_tagline', 'Qkbiz Smart Pass')).strip(),
                                 'chip_spec': (request.POST.get('nfc_chip_spec') or layout_config['nfc_card'].get('chip_spec', 'NTAG216 · 888 BYTES')).strip(),
                                 'back_tagline': (request.POST.get('nfc_back_tagline') or layout_config['nfc_card'].get('back_tagline', 'SMART CONTACTLESS TOUCHPOINT')).strip(),
                                 'tap_hint': (request.POST.get('nfc_tap_hint') or layout_config['nfc_card'].get('tap_hint', 'Tap against any smartphone to open card')).strip(),
@@ -2367,7 +2367,7 @@ def signup_view(request):
             )
             login(request, user)
             display_name = full_name or user.username
-            messages.success(request, f'Welcome to BrandNest, {display_name}! Your account has been created successfully.')
+            messages.success(request, f'Welcome to Qkbiz, {display_name}! Your account has been created successfully.')
             return redirect(next_url)
         except Exception as e:
             messages.error(request, f'Error creating account: {e}')
@@ -4135,15 +4135,15 @@ def admin_pricing(request):
     if request.method == 'POST':
         action = request.POST.get('action', 'save')
         if action == 'reset':
-            pricing.personal_digital_price = 499
+            pricing.personal_digital_price = 999
             pricing.personal_nfc_price = 999
-            pricing.enterprise_5_digital_price = 999
-            pricing.enterprise_10_digital_price = 1799
-            pricing.enterprise_15_digital_price = 2499
-            pricing.enterprise_5_nfc_price = 2499
-            pricing.enterprise_10_nfc_price = 4499
-            pricing.enterprise_15_nfc_price = 5999
-            pricing.enterprise_extra_card_price = 199
+            pricing.enterprise_5_digital_price = 3745
+            pricing.enterprise_10_digital_price = 7490
+            pricing.enterprise_15_digital_price = 11235
+            pricing.enterprise_5_nfc_price = 4999
+            pricing.enterprise_10_nfc_price = 8999
+            pricing.enterprise_15_nfc_price = 12999
+            pricing.enterprise_extra_card_price = 749
             pricing.save()
             messages.success(request, "Pricing configuration successfully reset to system defaults.")
         else:
