@@ -2090,9 +2090,9 @@
             <i class="bi bi-shield-lock-fill"></i> Admin
           </a>
           {% endif %}
-          <a class="pill sm nav-user-pill" href="{% url 'card_list' %}" style="background:#0084FF;color:#fff;display:inline-flex;align-items:center;gap:6px;max-width:200px;" title="Signed in as {{ user.username }}">
+          <span class="pill sm nav-user-pill" style="background:#0084FF;color:#fff;display:inline-flex;align-items:center;gap:6px;max-width:200px;cursor:default;user-select:none;pointer-events:none;" title="Signed in as {{ user.username }}">
             <i class="bi bi-person-circle"></i> <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ user.first_name|default:user.username }}</span>
-          </a>
+          </span>
           <a class="pill sm light desktop-only" href="{% url 'logout' %}">Sign Out</a>
         {% else %}
           <a class="pill sm light nav-login-btn" href="{% url 'login' %}">Log In</a>
