@@ -8301,6 +8301,51 @@
           };
           localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 
+          // 2. Perform background AJAX auto-save to Django database if cardForm exists
+          const form = $('cardForm');
+          if (form) {
+            const formData = new FormData(form);
+            formData.set('is_autosave', '1');
+
+            if (typeof capabilitiesList !== 'undefined') {
+              formData.set('capabilities_data', JSON.stringify(capabilitiesList || []));
+            }
+            if (typeof brandsList !== 'undefined') {
+              formData.set('brands_data', JSON.stringify(brandsList || []));
+            }
+            if (typeof bannersList !== 'undefined') {
+              formData.set('banners_data', JSON.stringify(bannersList || []));
+            }
+            if (typeof imagesList !== 'undefined') {
+              formData.set('images_data', JSON.stringify(imagesList || []));
+            }
+            if (typeof ytVideosList !== 'undefined') {
+              formData.set('yt_videos_json', JSON.stringify(ytVideosList || []));
+            }
+            if (typeof walletState !== 'undefined') {
+              formData.set('wallet_config', JSON.stringify(walletState || {}));
+            }
+
+            const saveUrl = form.getAttribute('action') || window.location.href;
+            fetch(saveUrl, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+              }
+            }).then(res => {
+              if (res.ok) {
+                const indicator = $('autoSaveIndicator');
+                if (indicator) {
+                  indicator.className = 'autosave-badge';
+                  indicator.innerHTML = '<i class="bi bi-cloud-check-fill"></i> <span>All changes saved</span>';
+                }
+              }
+            }).catch(err => {
+              console.warn('Network auto-save failed, saved to local draft:', err);
+            });
+          }
+
           const indicator = $('autoSaveIndicator');
           if (indicator) {
             indicator.className = 'autosave-badge';
@@ -8323,8 +8368,40 @@
             const inp = $(f);
             if (inp && draft[f] !== undefined && draft[f] !== '') {
               inp.value = draft[f];
+              try {
+                inp.dispatchEvent(new Event('input', { bubbles: true }));
+              } catch(e) {}
             }
           });
+
+          if (draft.owner_name || draft.business_name || draft.owner_role) {
+            updateIdentity();
+          }
+          if (draft.about_heading && $('pAboutHeading')) {
+            $('pAboutHeading').textContent = draft.about_heading;
+          }
+          if (draft.bio && $('pAboutText')) {
+            $('pAboutText').textContent = draft.bio;
+          }
+          if (draft.phone && $('pValPhone')) {
+            $('pValPhone').textContent = draft.phone;
+            if ($('pBtnCall')) $('pBtnCall').href = `tel:${draft.phone}`;
+          }
+          if (draft.email && $('pValEmail')) {
+            $('pValEmail').textContent = draft.email;
+            if ($('pBtnEmail')) $('pBtnEmail').href = `mailto:${draft.email}`;
+          }
+          if (draft.whatsapp && $('pValWhatsapp')) {
+            $('pValWhatsapp').textContent = draft.whatsapp;
+            if ($('pBtnWhatsapp')) $('pBtnWhatsapp').href = `https://wa.me/${draft.whatsapp.replace(/[^0-9]/g, '')}`;
+          }
+          if (draft.website && $('pValWebsite')) {
+            $('pValWebsite').textContent = draft.website;
+            if ($('pBtnWebsite')) $('pBtnWebsite').href = draft.website;
+          }
+          if (draft.address && $('pValAddress')) {
+            $('pValAddress').textContent = draft.address;
+          }
 
           if (draft.yt_channel_name) {
             const el = $('pYtChannelName');

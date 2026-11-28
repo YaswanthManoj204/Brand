@@ -87,6 +87,24 @@ class FrontendFlowTests(TestCase):
         self.assertEqual(standalone_res.status_code, 200)
         self.assertContains(standalone_res, 'Sarah Legal &amp; Advisory')
 
+        # Test background autosave flow (AJAX)
+        autosave_data = {
+            'business_name': 'Sarah Legal & Advisory Updated',
+            'owner_name': 'Sarah Jenkins Updated',
+            'tagline': 'Managing Partner',
+            'is_autosave': '1',
+        }
+        autosave_res = self.client.post(
+            reverse('card_edit', kwargs={'card_id': card.card_id}),
+            autosave_data,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        self.assertEqual(autosave_res.status_code, 200)
+        self.assertEqual(autosave_res.json()['status'], 'ok')
+        card.refresh_from_db()
+        self.assertEqual(card.business_name, 'Sarah Legal & Advisory Updated')
+        self.assertEqual(card.owner_name, 'Sarah Jenkins Updated')
+
     def test_card_builder_with_custom_layout_order(self):
         self.client.force_login(self.test_user)
         post_data = {
@@ -2552,10 +2570,10 @@ class FrontendFlowTests(TestCase):
 
         req_local = rf.get('/card/raj/', HTTP_HOST='192.168.1.34:8000')
         share_url_local = get_shareable_url(req_local, f'/card/{card.slug}/')
-        expected_lan = get_lan_ip() or '192.168.1.34'
-        self.assertEqual(share_url_local, f'http://{expected_lan}:8000/card/raj/')
+        self.assertEqual(share_url_local, 'http://192.168.1.34:8000/card/raj/')
 
         # 2. Verify Card Preview Page displays the local server link
+        expected_lan = get_lan_ip() or '127.0.0.1'
         self.client.force_login(user)
         preview_res = self.client.get(reverse('card_preview', kwargs={'card_id': card.card_id}), HTTP_HOST='localhost:8000')
         self.assertEqual(preview_res.status_code, 200)

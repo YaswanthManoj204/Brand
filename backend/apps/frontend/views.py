@@ -1235,9 +1235,15 @@ def card_builder(request, card_id=None):
         business_name = request.POST.get('business_name', '').strip()
 
         if not business_name:
-            messages.error(request, 'Please provide your business name.')
-            active_card = target_card or _build_default_card()
-            return render(request, 'card_builder.html', _get_card_builder_context(active_card, bool(target_card), request))
+            if request.POST.get('is_autosave') == '1' or request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                if target_card and target_card.business_name:
+                    business_name = target_card.business_name
+                else:
+                    return JsonResponse({'status': 'ignored', 'reason': 'business_name_required'}, status=200)
+            else:
+                messages.error(request, 'Please provide your business name.')
+                active_card = target_card or _build_default_card()
+                return render(request, 'card_builder.html', _get_card_builder_context(active_card, bool(target_card), request))
 
         # 1. Extract Social Links (supports both form naming conventions)
         social_links = {
@@ -1488,9 +1494,12 @@ def card_builder(request, card_id=None):
         }
         for key, label in payment_labels.items():
             if payments_data.get(f'{key}_enabled') and not payments_data.get(key):
-                messages.error(request, f'Please enter your {label} ID/link or turn off the {label} toggle.')
-                active_card = target_card or _build_default_card()
-                return render(request, 'card_builder.html', _get_card_builder_context(active_card, bool(target_card), request))
+                if request.POST.get('is_autosave') == '1' or request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    payments_data[f'{key}_enabled'] = False
+                else:
+                    messages.error(request, f'Please enter your {label} ID/link or turn off the {label} toggle.')
+                    active_card = target_card or _build_default_card()
+                    return render(request, 'card_builder.html', _get_card_builder_context(active_card, bool(target_card), request))
 
         # More section (Document with File or URL, Google Drive, Address)
         more_doc_url = request.POST.get('more_doc_url', '').strip() or request.POST.get('more_pdf_url', '').strip()
@@ -1867,6 +1876,14 @@ def card_builder(request, card_id=None):
                     send_user_nfc_order_placed_notification(card, share_url)
                 except Exception:
                     pass
+
+        if request.POST.get('is_autosave') == '1' or request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'ok',
+                'card_id': card.card_id,
+                'slug': card.slug,
+                'saved_at': timezone.now().strftime('%I:%M %p')
+            })
 
         if target_card and not request.POST.get('razorpay_payment_id') and not quota['is_enterprise']:
             if request.POST.get('action_publish_nfc') or request.POST.get('publish_nfc') == 'true':
